@@ -1,0 +1,2232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAGA — Make Aliens Great Again | Alien Scanner</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #00ff88;
+    --green-dim: #00cc66;
+    --red: #ff3355;
+    --amber: #ffaa00;
+    --blue: #00ccff;
+    --dark: #020b08;
+    --darker: #010605;
+    --panel: rgba(0, 20, 12, 0.92);
+    --border: rgba(0, 255, 136, 0.25);
+    --glow: 0 0 12px rgba(0, 255, 136, 0.4);
+    --text: #b8ffd8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    font-family: 'Share Tech Mono', monospace;
+    background: var(--dark);
+    color: var(--text);
+    height: 100%;
+    overflow: hidden;
+    cursor: crosshair;
+  }
+
+  #app-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  #header {
+    background: linear-gradient(180deg, rgba(0,10,5,0.98) 0%, rgba(0,10,5,0.85) 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 6px 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+    backdrop-filter: blur(8px);
+    flex-wrap: wrap;
+  }
+
+  #logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 0.9rem;
+    letter-spacing: 0.12em;
+    color: var(--green);
+    text-shadow: 0 0 20px rgba(0,255,136,0.8), 0 0 40px rgba(0,255,136,0.4);
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+  #logo small {
+    display: block;
+    font-size: 0.45rem;
+    color: rgba(0,255,136,0.5);
+    letter-spacing: 0.3em;
+    font-weight: 400;
+    margin-top: 1px;
+  }
+
+  .header-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: rgba(0,255,136,0.04);
+    min-width: 65px;
+  }
+  .header-stat .val {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--green);
+    text-shadow: var(--glow);
+  }
+  .header-stat .lbl {
+    font-size: 0.45rem;
+    color: rgba(0,255,136,0.45);
+    letter-spacing: 0.12em;
+    margin-top: 1px;
+  }
+
+  #status-bar {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.55rem;
+    color: rgba(0,255,136,0.5);
+    letter-spacing: 0.08em;
+  }
+
+  .live-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse-dot 1.2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  #clock {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    color: var(--green);
+  }
+
+  #filter-bar {
+    background: rgba(0,10,5,0.9);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.55rem;
+    padding: 2px 8px;
+    border: 1px solid rgba(0,255,136,0.25);
+    background: transparent;
+    color: rgba(0,255,136,0.5);
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    border-radius: 2px;
+    transition: all 0.15s;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background: rgba(0,255,136,0.12);
+    color: var(--green);
+    border-color: var(--green);
+  }
+  .filter-sep { width: 1px; height: 14px; background: var(--border); margin: 0 3px; }
+  #filter-count { margin-left: auto; font-size: 0.5rem; color: rgba(0,255,136,0.4); }
+
+  #main-content {
+    display: grid;
+    grid-template-columns: 220px 1fr 200px;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  #left-panel {
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .panel-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    color: var(--green);
+    text-transform: uppercase;
+    padding: 8px 10px 6px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  #feed-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    min-height: 0;
+  }
+  #feed-container::-webkit-scrollbar { width: 3px; }
+  #feed-container::-webkit-scrollbar-track { background: transparent; }
+  #feed-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .feed-item {
+    padding: 7px 10px;
+    border-bottom: 1px solid rgba(0,255,136,0.08);
+    cursor: pointer;
+    transition: background 0.15s;
+    animation: feed-in 0.4s ease;
+  }
+  .feed-item:hover { background: rgba(0,255,136,0.06); }
+  @keyframes feed-in {
+    from { opacity: 0; transform: translateX(-12px); background: rgba(0,255,136,0.15); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .feed-item .fi-time { font-size: 0.5rem; color: var(--amber); letter-spacing: 0.08em; margin-bottom: 1px; }
+  .feed-item .fi-location { font-size: 0.62rem; color: var(--green); font-weight: bold; margin-bottom: 1px; }
+  .feed-item .fi-desc { font-size: 0.52rem; color: rgba(184,255,216,0.6); line-height: 1.3; }
+  .feed-item .fi-shape {
+    display: inline-block;
+    font-size: 0.48rem;
+    padding: 1px 5px;
+    border: 1px solid;
+    border-radius: 2px;
+    margin-top: 3px;
+    letter-spacing: 0.08em;
+  }
+  .shape-circle { color: var(--blue); border-color: var(--blue); }
+  .shape-triangle { color: #ff88aa; border-color: #ff88aa; }
+  .shape-disk { color: var(--green); border-color: var(--green); }
+  .shape-orb { color: var(--amber); border-color: var(--amber); }
+  .shape-unknown { color: rgba(255,255,255,0.4); border-color: rgba(255,255,255,0.2); }
+
+  .source-badge {
+    float: right;
+    font-size: 0.45rem;
+    padding: 1px 4px;
+    border-radius: 2px;
+    letter-spacing: 0.06em;
+  }
+  .src-nuforc { background: rgba(0,200,255,0.15); color: var(--blue); border: 1px solid rgba(0,200,255,0.3); }
+  .src-mufon  { background: rgba(255,170,0,0.12); color: var(--amber); border: 1px solid rgba(255,170,0,0.3); }
+  .src-aaro   { background: rgba(255,50,80,0.12); color: var(--red); border: 1px solid rgba(255,50,80,0.3); }
+  .src-live   { background: rgba(0,255,136,0.12); color: var(--green); border: 1px solid var(--border); }
+
+  #links-panel {
+    border-top: 1px solid var(--border);
+    padding: 6px 10px 8px;
+    flex-shrink: 0;
+  }
+  #links-panel .panel-title { padding: 0 0 6px; border: none; }
+  .resource-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 0;
+    text-decoration: none;
+    color: rgba(184,255,216,0.7);
+    font-size: 0.5rem;
+    letter-spacing: 0.04em;
+    transition: color 0.15s;
+    border-bottom: 1px solid rgba(0,255,136,0.06);
+  }
+  .resource-link:hover { color: var(--green); }
+  .resource-link::before { content: '▶'; font-size: 0.4rem; color: var(--green); opacity: 0.6; }
+
+  #map-container {
+    position: relative;
+    overflow: hidden;
+    background: #000000;
+  }
+
+  #map-canvas {
+    width: 100%;
+    height: 100%;
+    transform-origin: 0 0;
+    animation: grid-flicker 8s linear infinite;
+  }
+  @keyframes grid-flicker {
+    0%, 97%, 100% { opacity: 1; }
+    98% { opacity: 0.7; }
+  }
+
+  #zoom-controls {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .zoom-btn {
+    width: 28px;
+    height: 28px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--green);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    transition: all 0.15s;
+    font-family: 'Share Tech Mono', monospace;
+  }
+  .zoom-btn:hover { background: rgba(0,255,136,0.15); border-color: var(--green); }
+
+  #right-panel {
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  #right-panel::-webkit-scrollbar { width: 3px; }
+  #right-panel::-webkit-scrollbar-track { background: transparent; }
+  #right-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .stat-block {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .stat-block .sb-label {
+    font-size: 0.48rem;
+    color: rgba(0,255,136,0.45);
+    letter-spacing: 0.15em;
+    margin-bottom: 3px;
+  }
+  .stat-block .sb-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--green);
+    text-shadow: var(--glow);
+  }
+  .stat-block .sb-sub {
+    font-size: 0.48rem;
+    color: var(--amber);
+    margin-top: 1px;
+  }
+
+  .shape-bar { margin-top: 3px; }
+  .shape-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+    font-size: 0.5rem;
+  }
+  .shape-row .sr-name { width: 50px; color: rgba(184,255,216,0.7); }
+  .shape-row .sr-bar-wrap {
+    flex: 1;
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .shape-row .sr-bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s ease;
+  }
+  .shape-row .sr-count { width: 24px; text-align: right; color: rgba(184,255,216,0.5); }
+
+  #alert-box {
+    margin: 6px 10px;
+    padding: 8px;
+    border: 1px solid rgba(255, 51, 85, 0.5);
+    border-radius: 4px;
+    background: rgba(255,51,85,0.07);
+    animation: alert-pulse 2s ease-in-out infinite;
+    display: none;
+  }
+  #alert-box.active { display: block; }
+  @keyframes alert-pulse {
+    0%, 100% { border-color: rgba(255,51,85,0.5); box-shadow: none; }
+    50% { border-color: rgba(255,51,85,0.9); box-shadow: 0 0 12px rgba(255,51,85,0.3); }
+  }
+  #alert-box .ab-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.5rem;
+    color: var(--red);
+    letter-spacing: 0.12em;
+    margin-bottom: 3px;
+  }
+  #alert-box .ab-text {
+    font-size: 0.5rem;
+    color: rgba(255,100,120,0.8);
+    line-height: 1.3;
+  }
+  .alert-zone-item {
+    padding: 4px 6px;
+    margin-top: 4px;
+    border: 1px solid rgba(255,51,85,0.3);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    background: rgba(255,51,85,0.05);
+  }
+  .alert-zone-item:hover {
+    background: rgba(255,51,85,0.15);
+    border-color: rgba(255,51,85,0.7);
+  }
+  .alert-zone-item.active-zone {
+    background: rgba(255,51,85,0.2);
+    border-color: rgba(255,51,85,0.8);
+  }
+  .alert-zone-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.48rem;
+    color: var(--red);
+    letter-spacing: 0.08em;
+  }
+  .alert-zone-detail {
+    font-size: 0.45rem;
+    color: rgba(255,150,160,0.7);
+    margin-top: 2px;
+  }
+  #high-alert-stat:hover {
+    background: rgba(255,51,85,0.15) !important;
+    border-radius: 4px;
+  }
+  @keyframes alert-circle-pulse {
+    0% { opacity: 0.4; stroke-width: 2; }
+    50% { opacity: 0.8; stroke-width: 3; }
+    100% { opacity: 0.4; stroke-width: 2; }
+  }
+  .alert-circle {
+    fill: rgba(255,51,85,0.08);
+    stroke: rgba(255,51,85,0.6);
+    stroke-width: 2;
+    animation: alert-circle-pulse 2s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .alert-circle-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 5px;
+    fill: rgba(255,51,85,0.7);
+    text-anchor: middle;
+    pointer-events: none;
+  }
+
+  #bottom-bar {
+    background: rgba(0,10,5,0.95);
+    border-top: 1px solid var(--border);
+    height: 24px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  #ticker {
+    white-space: nowrap;
+    font-size: 0.52rem;
+    color: rgba(0,255,136,0.55);
+    letter-spacing: 0.05em;
+    animation: scroll-ticker 60s linear infinite;
+    padding-left: 100%;
+  }
+  @keyframes scroll-ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+  }
+
+  .ping {
+    cursor: pointer;
+  }
+
+  .ping-ring {
+    fill: none;
+    pointer-events: none;
+    animation: ring-out 2s ease-out infinite;
+    transform-origin: center;
+  }
+  @keyframes ring-out {
+    0% { r: 4; opacity: 0.8; }
+    100% { r: 22; opacity: 0; }
+  }
+  .ping-ring2 {
+    fill: none;
+    pointer-events: none;
+    animation: ring-out 2s ease-out 0.7s infinite;
+    transform-origin: center;
+  }
+
+  #tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: rgba(0,15,10,0.95);
+    border: 1px solid var(--green);
+    border-radius: 4px;
+    padding: 8px 12px;
+    z-index: 200;
+    max-width: 240px;
+    display: none;
+    box-shadow: 0 0 20px rgba(0,255,136,0.2);
+  }
+  #tooltip .tt-location { font-family: 'Orbitron', monospace; font-size: 0.65rem; color: var(--green); margin-bottom: 3px; }
+  #tooltip .tt-time { font-size: 0.5rem; color: var(--amber); margin-bottom: 4px; }
+  #tooltip .tt-desc { font-size: 0.52rem; color: var(--text); line-height: 1.4; }
+  #tooltip .tt-source { font-size: 0.48rem; color: rgba(184,255,216,0.4); margin-top: 4px; border-top: 1px solid var(--border); padding-top: 4px; }
+  #tooltip .tt-link {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 3px 8px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.5rem;
+    color: var(--dark);
+    background: var(--green);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #tooltip .tt-link:hover { background: var(--amber); }
+
+  #sighting-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+    animation: modal-fade 0.2s ease;
+  }
+  #sighting-modal-overlay.active { display: flex; }
+  @keyframes modal-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  #sighting-modal {
+    background: linear-gradient(180deg, rgba(0,20,12,0.98) 0%, rgba(0,10,5,0.98) 100%);
+    border: 1px solid var(--green);
+    box-shadow: 0 0 40px rgba(0,255,136,0.25), 0 0 80px rgba(0,255,136,0.1);
+    max-width: 420px;
+    width: 90%;
+    padding: 0;
+    position: relative;
+    animation: modal-slide 0.3s ease;
+  }
+  @keyframes modal-slide {
+    from { opacity: 0; transform: translateY(20px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  #sighting-modal .sm-header {
+    background: rgba(0,255,136,0.08);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  #sighting-modal .sm-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: 0.15em;
+    text-shadow: var(--glow);
+  }
+  #sighting-modal .sm-close {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--green);
+    font-size: 1rem;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    font-family: 'Share Tech Mono', monospace;
+  }
+  #sighting-modal .sm-close:hover { background: rgba(255,51,85,0.2); border-color: var(--red); color: var(--red); }
+  #sighting-modal .sm-body { padding: 16px; }
+  #sighting-modal .sm-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(0,255,136,0.08);
+  }
+  #sighting-modal .sm-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  #sighting-modal .sm-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.48rem;
+    color: rgba(0,255,136,0.5);
+    letter-spacing: 0.15em;
+    min-width: 70px;
+    padding-top: 2px;
+    flex-shrink: 0;
+  }
+  #sighting-modal .sm-value {
+    font-size: 0.6rem;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  #sighting-modal .sm-location {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--green);
+    text-shadow: var(--glow);
+  }
+  #sighting-modal .sm-shape-tag {
+    display: inline-block;
+    font-size: 0.5rem;
+    padding: 2px 8px;
+    border: 1px solid;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+  }
+  #sighting-modal .sm-source-tag {
+    display: inline-block;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.5rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+  }
+  #sighting-modal .sm-desc {
+    font-size: 0.6rem;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  #sighting-modal .sm-link {
+    display: block;
+    margin-top: 16px;
+    padding: 10px 16px;
+    background: var(--green);
+    color: var(--dark);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  #sighting-modal .sm-link:hover { background: var(--amber); }
+
+  #scanlines {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+    z-index: 5;
+  }
+
+  #toast {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: rgba(0,15,10,0.97);
+    border: 1px solid var(--green);
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem;
+    color: var(--green);
+    letter-spacing: 0.1em;
+    z-index: 300;
+    opacity: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(0,255,136,0.3);
+    pointer-events: none;
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  #watermark {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.4rem;
+    color: rgba(0,255,136,0.08);
+    letter-spacing: 0.3em;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  #mobile-tabs {
+    display: none;
+    background: rgba(0,10,5,0.95);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .mobile-tab {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    color: rgba(0,255,136,0.5);
+    cursor: pointer;
+    flex: 1;
+    text-align: center;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .mobile-tab.active {
+    color: var(--green);
+    border-bottom-color: var(--green);
+    background: rgba(0,255,136,0.06);
+  }
+
+  @media (max-width: 768px) {
+    html, body { overflow: auto; }
+    #app-wrapper { height: auto; min-height: 100vh; min-height: 100dvh; }
+
+    #header {
+      padding: 4px 8px;
+      gap: 6px;
+    }
+    #logo { font-size: 0.7rem; }
+    #logo small { font-size: 0.38rem; }
+    #logo img { height: 40px !important; width: 40px !important; }
+    .header-stat { min-width: 50px; padding: 2px 6px; }
+    .header-stat .val { font-size: 0.7rem; }
+    .header-stat .lbl { font-size: 0.38rem; }
+    #status-bar { font-size: 0.45rem; width: 100%; justify-content: center; margin-left: 0; }
+
+    #filter-bar {
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    #filter-bar::-webkit-scrollbar { display: none; }
+    .filter-btn { white-space: nowrap; flex-shrink: 0; }
+    #filter-count { white-space: nowrap; flex-shrink: 0; }
+
+    #mobile-tabs { display: flex; }
+
+    #main-content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+
+    #left-panel {
+      display: none;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    #left-panel.mobile-visible {
+      display: flex;
+    }
+
+    #map-container {
+      min-height: 50vh;
+      min-height: 50dvh;
+      flex: 1;
+      touch-action: none;
+    }
+    #map-container.mobile-hidden { display: none; }
+
+    #right-panel {
+      display: none;
+      border-left: none;
+      border-top: 1px solid var(--border);
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    #right-panel.mobile-visible {
+      display: flex;
+    }
+
+    #zoom-controls {
+      bottom: 36px;
+      right: 6px;
+      gap: 4px;
+    }
+    .zoom-btn { width: 42px; height: 42px; font-size: 1.4rem; }
+
+    #watermark { font-size: 0.35rem; bottom: 4px; }
+
+    #tooltip {
+      max-width: calc(100vw - 20px);
+      left: 10px !important;
+      right: 10px;
+      top: auto !important;
+      bottom: 60px;
+      position: fixed;
+      width: auto;
+    }
+
+    #toast { font-size: 0.48rem; top: auto; bottom: 30px; }
+
+    #bottom-bar { height: 20px; }
+    #ticker { font-size: 0.45rem; }
+
+    .feed-item .fi-desc { font-size: 0.5rem; }
+    .feed-item .fi-location { font-size: 0.58rem; }
+
+    .stat-block .sb-value { font-size: 0.9rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app-wrapper">
+
+<!-- HEADER -->
+<div id="header">
+  <div id="logo">
+    <svg viewBox="0 0 24 24" style="height:48px;width:48px;vertical-align:middle;margin-right:6px;display:inline" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="var(--green)" stroke-width="1" opacity="0.3"/><circle cx="12" cy="12" r="7" fill="none" stroke="var(--green)" stroke-width="1" opacity="0.4"/><circle cx="12" cy="12" r="4" fill="none" stroke="var(--green)" stroke-width="1" opacity="0.6"/><circle cx="12" cy="12" r="1.5" fill="var(--green)" opacity="0.8"/><line x1="12" y1="12" x2="18" y2="6" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"/><circle cx="18" cy="6" r="2" fill="var(--green)" opacity="0.9"><animate attributeName="opacity" values="0.9;0.3;0.9" dur="1.5s" repeatCount="indefinite"/></circle><line x1="12" y1="2" x2="12" y2="4" stroke="var(--green)" stroke-width="0.8" opacity="0.3"/><line x1="12" y1="20" x2="12" y2="22" stroke="var(--green)" stroke-width="0.8" opacity="0.3"/><line x1="2" y1="12" x2="4" y2="12" stroke="var(--green)" stroke-width="0.8" opacity="0.3"/><line x1="20" y1="12" x2="22" y2="12" stroke="var(--green)" stroke-width="0.8" opacity="0.3"/></svg> M.A.G.A
+    <small>MAKE ALIENS GREAT AGAIN · GLOBAL ALIEN SCANNER</small>
+  </div>
+  <div class="header-stat">
+    <div class="val" id="h-total">0</div>
+    <div class="lbl">TOTAL SIGHTINGS</div>
+  </div>
+  <div class="header-stat">
+    <div class="val" id="h-today">0</div>
+    <div class="lbl">TODAY</div>
+  </div>
+  <div class="header-stat">
+    <div class="val" id="h-countries">12</div>
+    <div class="lbl">COUNTRIES</div>
+  </div>
+  <div class="header-stat" id="high-alert-stat" style="cursor:pointer" onclick="toggleAlertZones()">
+    <div class="val" style="color: var(--red)" id="h-alerts">⚡ 0</div>
+    <div class="lbl">HIGH ALERT</div>
+  </div>
+  <div id="status-bar">
+    <div class="live-dot"></div>
+    <span>LIVE FEED ACTIVE</span>
+    <span>|</span>
+    <span>SCANNING NUFORC · MUFON · AARO</span>
+    <span>|</span>
+    <div id="clock">00:00:00 UTC</div>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div id="filter-bar">
+  <span style="font-size:0.5rem; color: rgba(0,255,136,0.4); letter-spacing:0.12em; margin-right:3px;">FILTER:</span>
+  <button class="filter-btn active" onclick="filterSightings('all', this)">ALL</button>
+  <button class="filter-btn" onclick="filterSightings('circle', this)">CIRCLE</button>
+  <button class="filter-btn" onclick="filterSightings('triangle', this)">TRIANGLE</button>
+  <button class="filter-btn" onclick="filterSightings('disk', this)">DISK</button>
+  <button class="filter-btn" onclick="filterSightings('orb', this)">ORB</button>
+  <div class="filter-sep"></div>
+  <button class="filter-btn" onclick="filterSightings('nuforc', this)">NUFORC</button>
+  <button class="filter-btn" onclick="filterSightings('mufon', this)">MUFON</button>
+  <button class="filter-btn" onclick="filterSightings('aaro', this)">AARO</button>
+  <div id="filter-count">SHOWING ALL <span id="showing-count">0</span> REPORTS</div>
+</div>
+
+<!-- MOBILE TABS -->
+<div id="mobile-tabs">
+  <button class="mobile-tab" onclick="switchMobileTab('feed')">📡 FEED</button>
+  <button class="mobile-tab active" onclick="switchMobileTab('map')">🗺️ MAP</button>
+  <button class="mobile-tab" onclick="switchMobileTab('stats')">📊 STATS</button>
+</div>
+
+<!-- MAIN 3-COLUMN LAYOUT -->
+<div id="main-content">
+
+  <!-- LEFT: LIVE FEED -->
+  <div id="left-panel">
+    <div class="panel-title">
+      <div class="live-dot"></div>
+      LIVE SIGHTING FEED
+    </div>
+    <div id="feed-container"></div>
+    <div id="links-panel">
+      <div class="panel-title">🔗 DATA SOURCES</div>
+      <a class="resource-link" href="https://nuforc.org" target="_blank">NUFORC.ORG — National UFO Reporting Center</a>
+      <a class="resource-link" href="https://mufon.com" target="_blank">MUFON.COM — Mutual UFO Network</a>
+      <a class="resource-link" href="https://ufostalker.com" target="_blank">UFOSTALKER.COM — Live Map Feed</a>
+      <a class="resource-link" href="https://aaro.mil" target="_blank">AARO.MIL — Official US Gov UAP Reports</a>
+    </div>
+  </div>
+
+  <!-- CENTER: WORLD MAP -->
+  <div id="map-container">
+    <svg id="map-canvas" viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <defs>
+        <radialGradient id="mapGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" style="stop-color:#021a10;stop-opacity:1"/>
+          <stop offset="100%" style="stop-color:#010805;stop-opacity:1"/>
+        </radialGradient>
+        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0,255,136,0.06)" stroke-width="0.5"/>
+        </pattern>
+        <filter id="glow-filter">
+          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+          <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <rect width="1000" height="600" fill="url(#mapGrad)"/>
+      <rect width="1000" height="600" fill="url(#grid)"/>
+
+      <g id="lat-lng-lines" stroke="rgba(0,255,136,0.06)" stroke-width="0.3" stroke-dasharray="2,6" fill="none">
+        <line x1="0" y1="100" x2="1000" y2="100"/>
+        <line x1="0" y1="199" x2="1000" y2="199"/>
+        <line x1="0" y1="297" x2="1000" y2="297"/>
+        <line x1="0" y1="396" x2="1000" y2="396"/>
+        <line x1="0" y1="495" x2="1000" y2="495"/>
+        <line x1="165" y1="0" x2="165" y2="600"/>
+        <line x1="249" y1="0" x2="249" y2="600"/>
+        <line x1="333" y1="0" x2="333" y2="600"/>
+        <line x1="416" y1="0" x2="416" y2="600"/>
+        <line x1="500" y1="0" x2="500" y2="600"/>
+        <line x1="584" y1="0" x2="584" y2="600"/>
+        <line x1="667" y1="0" x2="667" y2="600"/>
+        <line x1="751" y1="0" x2="751" y2="600"/>
+        <line x1="835" y1="0" x2="835" y2="600"/>
+        <line x1="919" y1="0" x2="919" y2="600"/>
+      </g>
+      <g id="lat-lng-labels" font-family="Share Tech Mono" font-size="6" fill="rgba(0,255,136,0.15)">
+        <text x="3" y="98">60°N</text>
+        <text x="3" y="197">30°N</text>
+        <text x="3" y="295">EQ</text>
+        <text x="3" y="394">30°S</text>
+        <text x="3" y="493">60°S</text>
+        <text x="165" y="10" text-anchor="middle">120°W</text>
+        <text x="249" y="10" text-anchor="middle">90°W</text>
+        <text x="333" y="10" text-anchor="middle">60°W</text>
+        <text x="416" y="10" text-anchor="middle">30°W</text>
+        <text x="500" y="10" text-anchor="middle">0°</text>
+        <text x="584" y="10" text-anchor="middle">30°E</text>
+        <text x="667" y="10" text-anchor="middle">60°E</text>
+        <text x="751" y="10" text-anchor="middle">90°E</text>
+        <text x="835" y="10" text-anchor="middle">120°E</text>
+        <text x="919" y="10" text-anchor="middle">150°E</text>
+      </g>
+
+      <g id="world-map" fill="rgba(0,80,40,0.35)" stroke="rgba(0,255,136,0.25)" stroke-width="0.5">
+<path d="M670,181.2L675,182L679.3,179L682.2,175.6L686.3,175.5L691.3,175.5L694.8,174.7L698.2,172.5L699.6,177.5L703.5,175L708.3,175.3L702.6,177.6L698,179.8L697.5,184.2L694.3,186.6L692.4,191.7L688.3,194.7L684.4,197.5L680.7,201.8L676.5,201.8L669.1,200.6L671.6,197.5L669.1,192.7L669.3,188.2L670,181.2Z"/>
+<path d="M545.4,319.6L546.8,324.1L550.4,326.6L553.9,323.9L560.4,324.3L560.6,329.7L561.5,336.9L565.2,336.2L566.9,340.6L560.9,343L560.8,353.6L564.5,358.4L559.4,359.8L552.7,359.3L539.5,357.8L535.6,356.5L532.7,352.6L533.8,348.2L535.4,343.8L537.9,340.1L538,335.8L535.8,330.6L535.9,325.3L534,321L537.2,319.5L545.4,319.6Z M534.5,318.9L535.1,314.8L534.5,318.9Z"/>
+<path d="M557.2,160.5L558.3,164.7L556,167.9L553.7,164.2L553.6,159.3L557.2,160.5Z"/>
+<path d="M643.3,219.2L648.3,219.5L651.9,217.3L655.8,213.1L655,219.1L653.4,223L644.4,223.3L643.3,219.2Z"/>
+<path d="M318.1,484L314,483L309.4,482.9L309.3,475.5L311.8,479.5L315.4,481.5L319.3,482.3Z M319.5,373.6L325.4,373.4L331,379.6L336.6,382.6L339.9,385.3L337.2,390.4L343.1,391.8L347.8,388.7L349.6,385.2L351,389.7L346.8,392.9L343.6,396.2L339.9,400.7L338.5,406.8L337.9,410.9L341,417.6L342.4,421.4L339.6,427.3L335.5,429.1L329.9,429.8L326.9,433.9L322.9,437.2L319.1,436.9L321.4,441.2L318.9,445L317.9,450.1L313.1,451.8L315,456.8L316.7,460.4L313.4,462.3L311.6,466.2L307.9,469.1L310.7,474.5L306.9,473.8L300.2,473.4L299.1,468.9L296.1,464.4L299.1,460.8L300.2,456.3L301.2,451.9L300.6,447.4L299.6,440.8L300.2,436.1L301.6,429.7L302.4,425.3L304.5,420L306.1,414L304.1,404.6L305.5,397.9L308.3,391.7L310,387.3L310,381.7L313.9,376.6L315.9,372.8L319.5,373.6Z"/>
+<path d="M621.1,163L624.9,162.5L627.5,165.9L629.2,170.8L625.8,168.4L621.3,165.8Z"/>
+<path d="M334.5,566.8L327.1,569.5L320.9,569.7L317.4,568.6L322.1,567.6L328.1,568L331.6,565.4Z M57.8,565L52.4,565.4L48.8,564.3L45.2,562L52.1,561.3L57,563.5Z M374.6,560.2L378,561.6L379.6,566.8L375.3,567.8L370.8,568.6L365.6,569.4L359.8,570.1L353.2,569.9L349.5,568.8L356,566.5L360.1,563.9L363,561.5L366.2,560.2L370.4,559.4L374.6,560.2Z M163.3,545L166.9,545.5L162.2,546.7Z M151.2,544.9L155.5,546.2L150.2,545.8L146.4,544.9L151.2,544.9Z M225.1,539.8L231.1,539.8L227.2,541.6L223.8,541.5L220,541.7L215.7,539.6L221,539.5L225.1,539.8Z M309.9,536.5L308.9,540.6L302.6,541.7L298.9,541.6L293.9,541.2L296.6,537.2L300.6,535.6L302.3,530.1L306.3,530.8L309.1,535Z M337.2,513.8L331.6,514.4L327.7,516L327.4,520.6L322.9,521.7L319.8,523.8L318.6,527.9L322.3,529.7L325.6,532.1L328.3,535.7L329.5,540L331.4,543.9L327.9,548.1L324.2,548.6L321.2,550.9L317.1,552.1L313.4,552.6L309.9,553.4L306.1,554.1L299.4,555.6L294.5,555.4L290.1,555.7L285.4,555.7L290.6,557.6L295.4,559.7L287.5,560.4L283.5,561.3L286.5,565L290.7,567.5L296.5,568.1L301.5,569L305.5,570L310.6,571.1L317.5,571.6L324.3,572.5L329,573.5L334.2,574.6L338.3,577.4L341.6,576.2L346.2,575.2L351.1,574.2L356.8,573.3L361.8,572.4L368.7,572.4L375.5,572.8L381.1,573.6L386.7,571.2L393.8,571.1L399.3,570.4L404.5,569.7L410.2,569.2L416.4,568.6L420.7,567.8L417.5,565.4L412.2,564.3L406.4,564.9L401,564.9L401.9,560.4L405.8,559.6L410.5,558.8L413.9,557.9L417.3,556.9L423.6,555L427.3,554.5L433.5,554.1L437.6,553.7L441,553L444.4,552.2L451.3,550.4L456.4,548.3L457.1,543.8L463,542.4L468,540L471.4,537.6L476.1,538.9L479.5,537.7L483.9,536.8L487.9,538.2L491.5,537.6L495,537.2L499.4,538.8L505.2,537.1L511.5,536.2L517.4,534.9L521.5,533L526.5,533.4L530,536.1L534.5,534.2L540.9,533.4L547.3,533L553.5,533L559.6,533.6L562.7,535.7L569,534.9L575.3,534.9L581,534L586,532.5L591,531.3L594.1,528.3L598.1,530L603.3,530.6L607.4,532.6L611.2,530.4L616.6,528.7L622.5,527.6L627,526.1L631.8,525.7L636.1,523.6L641,522.9L646.2,520.2L651.5,519.4L656.5,519.9L661.5,523.4L666.5,524.7L670.6,526.5L675.5,526.1L680.5,525.4L685.9,526.2L691.4,526.4L693.6,529.9L690.5,533.1L690.1,538.1L694.1,540.9L698.8,539L703,535.7L706.9,532.6L712.9,532.1L717,530.2L719.8,527.8L724.8,526.3L727.9,524.6L732.7,524.4L737.9,523.6L743,522.9L746.7,523.2L751.8,524.1L757.2,524L761.6,523.7L766.1,524.6L771.6,524.2L777,524.2L780.3,521.9L785.6,518.5L789.6,519.9L794.9,523.1L800.2,523.2L806.2,522.3L810.4,520.4L815.6,519.6L819.2,521.3L824.2,522.2L829.4,523.9L832.9,524.2L837.9,522.9L842.3,521.6L847.7,522.4L852.8,521.9L857.8,522.5L863.3,521.4L869.3,521.3L874.3,520.7L878.4,521.5L881.8,523.2L888.6,522.9L894.8,522.7L901,522.8L906.1,524.1L910.3,527.1L917,528.5L920.8,529.1L926.8,529.6L931,529.5L935.6,531.3L942.2,532L946.7,534.1L951.9,535.8L958.1,535.9L964.7,536.1L970.7,537.4L975.6,539L972.5,543L966.6,546L961.4,547.9L958.2,550.5L955.1,552.9L954.1,556.9L957.6,560.6L962.8,561.1L958.9,563L954.6,563.7L949.4,563.9L946.5,567.3L949,572.3L954.7,574.7L958.6,575.7L962.8,576.7L969.2,577.8L978.6,580.1L988.8,580.5L995.2,581.6L1000,582.4L0.2,582.4L7.6,581.5L11.3,580.4L15.6,581.8L19.1,580.4L27.9,579.6L31.9,580.8L36,581.9L43.9,582.8L50.2,583.8L60.9,584.6L68.9,583.7L80.7,584.3L87.4,585.4L94.8,584.4L102.5,583.5L92.1,581.8L83.2,581L73.4,579L75.9,574.8L70.8,572.6L64.3,570.3L71.1,570.5L77.5,570L81.5,571.1L86.5,570.1L91.1,568.9L88.7,565.5L84.6,564.5L78.9,564.3L73.9,563.9L68.5,563.5L63.1,561.3L60.1,556.3L64,557.7L68.5,557.3L72.9,556.9L79.6,558L83.3,557.3L86.8,556.4L94.2,554.9L97.5,550.7L103.3,551.1L110.5,550.2L114.3,549.9L118,549.1L124.4,547.7L128.5,548.1L132.6,547.7L136.3,548.3L140.1,548.2L143.8,547.7L147.5,548.1L151.7,548.4L155.5,548.3L159.5,548.3L163.7,548.4L167.5,548.3L173.7,546.8L177.2,547.5L183.5,545.7L188.1,549L194.3,549.3L198,549.7L205.1,550.4L208.7,549.8L212.9,550L216.6,550.4L220.4,551L218.7,547.3L215.2,547L212,542.1L217.8,542.7L221.4,542.5L227.4,544L232.4,545.4L236,544.9L239.8,544.3L243.2,543.9L249.8,544.4L254.4,543.4L261.1,543.6L267,545.1L273.7,546.2L277,543.8L283.5,544.7L288.3,546.6L292,546.2L297.7,544.7L305,543.8L308.5,543.4L312.9,541.6L312.3,537.5L309.8,533.7L311.2,529.8L312.2,525.7L314.7,521.9L318.4,519.7L321.7,517.2L325,515.5L329.4,514.2L333.6,513.2L337.2,511.3L341,511.8L337.2,513.8Z"/>
+<path d="M691.5,462.1L695.9,463.6L691,465.9Z"/>
+<path d="M903.9,436L908.1,436.7L911.9,436.3L911.2,441.4L908,445.4L904,442.3L902,437.2Z M898.8,345.9L902.5,348.6L904.1,354.3L906,359.2L909.6,364.9L913.5,368L915.8,374.5L919.2,378.2L922.4,381.5L925.4,386.9L926.6,393.7L925.9,398.2L925.2,403.1L923.5,408.5L920.4,412.7L918.7,417.2L916.9,421.4L915.1,425.9L909.4,427.4L906.4,430.1L902.4,428.1L898.9,429.4L894.9,427.9L890.7,426.7L888.4,422.1L883.7,418.7L883.9,414.6L880.1,417.5L882,413.8L882.8,409.7L878.8,413.6L875.6,414.9L873.9,410.7L869.4,406.7L864.8,405L859.8,405.3L856.2,406.5L850.4,407.4L845.1,409.9L841.1,413L836.9,412.7L833,413.3L829.2,415.8L825.8,416.8L821,414.6L821.3,409.7L821.4,405.4L819.4,400.1L818.4,396L816.8,391.1L814.8,387.1L815.6,382.3L816.2,376.9L817.1,372.5L820.7,371.7L824.2,369L828.4,367.9L832.8,366.6L837.2,364.1L839.6,360.7L841.7,354.7L845.2,354.4L847,350.3L850.3,347.8L855,347.6L858.3,349.6L860.8,345.4L862.8,341.8L868.3,340.4L873.3,340.1L877.5,339.9L878.6,344.3L876.2,349.1L880.7,352.9L884.2,356L889.5,359L891.9,356.1L893.6,350.1L893.1,345.7L893.6,341.4L894.8,336.8L897.5,339.7L898.9,344.7Z"/>
+<path d="M547.2,139.6L545,143.8L540.6,145.2L534.4,144.1L530.7,144.2L526.3,143L531.7,141.6L535.9,141.8L537.8,137.1L541.4,136.8L545.8,137.4Z"/>
+<path d="M625,167.5L628.2,170.9L624.9,168.9Z M631.6,162.6L635,160.6L637.8,164.8L636.7,169.8L633.4,170.7L629.2,170.8L626.7,167L624.9,162.5L629.2,163.1Z"/>
+<path d="M581.5,315L580.6,309.5L584.6,308L583.7,313.6Z"/>
+<path d="M509.2,128.8L513.8,128.4L517.1,130.7L515.8,134.9L511.9,133.6L508.7,130.7Z"/>
+<path d="M507.5,279.1L504.6,269.6L502.1,265.1L504,261.5L506.9,259.2L510,261.1L510,265.6L508.1,269.5L507.6,273.8L507.5,279.1Z"/>
+<path d="M492.1,267.9L488,268L485,265.4L485.5,261L488.1,255.9L491.8,254L494.4,251.5L498.6,249.6L501.2,253.4L502.8,257.2L506,260.2L503.5,263L498.8,263L491.8,263.5L492.1,267.9Z"/>
+<path d="M757.4,226.5L756.6,231.1L755.1,226.1L751.4,224L749.2,227.1L746.9,223.7L746.4,219.2L745,214.1L749.5,213.4L752.4,216.2L756.6,216.7L754.1,219.8L757.4,226.5Z"/>
+<path d="M562.9,152.6L566.9,154.2L571,154.4L575.7,152.7L579.3,154.3L576.9,158.1L572.5,160.6L568,161.4L563.8,162.2L562.3,158.1L562.3,153.3Z"/>
+<path d="M284.6,220.8L282.8,216L284.6,220.8Z"/>
+<path d="M552.8,150.5L554,154.8L551.6,157.8L548,155.2L545.1,152.2L549.6,149.8Z"/>
+<path d="M565.2,120.3L570.9,119.1L573.9,116.1L578.3,112.8L581.6,114.4L585.8,114.8L587.2,119.5L590.8,122.2L587,123.1L585.1,127.3L581.3,128.8L576.3,128L570.4,127L566.7,127.9L566.1,123Z"/>
+<path d="M252.4,240.6L254.6,244.9L252.4,240.6Z"/>
+<path d="M325.4,373.4L321.2,376L315.9,372.8L313.6,375.8L310.5,371.6L309,367.9L308.4,363.3L306.7,358.6L308.4,355L307.4,349.8L308.5,345.3L306.9,336.5L310.4,336.7L313.4,334.4L318.5,332.5L318.3,338.6L321.3,341.5L325.5,343.3L330.3,344.9L332.6,348.8L332.9,354.2L338.2,354.3L339.6,358.5L339.8,363.2L338.4,367.3L335.8,364.5L328.4,365.4L327,370.2L325.9,374.2Z"/>
+<path d="M339.9,400.7L343.6,396.2L346.8,392.9L351,389.7L349.6,385.2L349.2,380.1L345.8,378.6L345,374.5L339.1,373.6L339.2,369.1L339,364.7L340.3,360.6L337.8,356.3L332.9,354.2L331.8,350.3L331.9,345.9L328.6,345L324.5,342.1L318.3,338.6L318.5,332.5L314.9,333.1L311,335.7L306.9,336.5L304.2,331.6L299.5,333.5L297.2,330.1L294.5,325.1L296.9,322.1L297.5,317.6L300.7,315.3L305.9,314.3L307.1,305.2L305.5,300.6L307.7,296.7L311.5,294.4L315.8,297.6L320.5,295.6L324,292.7L321.1,289.6L324.7,287.4L330.6,284.9L334.6,286.8L333.4,290.8L336,295.6L339.8,294.4L344.5,293.9L348.5,292.3L352.9,292.9L354.9,289.2L357.5,286L359.7,293.7L359.2,299.3L364.9,300.8L370.6,303.1L375.3,305.2L379.4,307.9L384.8,309.7L388.9,309.6L393.1,312.3L396.6,316.1L401.1,317.2L403.1,322.5L402.4,330L397.1,336.8L395.3,340.6L392.6,343.5L392,352.2L391.2,357.4L389.6,365.3L386.7,369.7L384,374.6L380.3,376.6L376,377.8L370.9,380.3L367.6,383L365.3,386.3L365.3,390.6L364.2,395.6L359.2,403.3L354.8,407.5L351.7,412.6L350.6,406.8L345.6,402.8L341.7,400.4Z"/>
+<path d="M817.2,284.9L820.7,281.8L819.1,285.5Z"/>
+<path d="M754.7,207.4L751,210.4L746.8,209.7L750,205.7L753.5,206.5Z"/>
+<path d="M571.2,361.8L575.8,368L577.8,371.6L581.8,373.6L577.8,376.1L574.4,380.8L571.6,383.9L567.3,385.6L563.4,385L560,389.1L556,383.1L555.3,372.8L558.1,360.8L564.4,359.6L568.1,359.6L571.2,361.8Z"/>
+<path d="M542.4,275.3L546.4,275L549.9,273.7L552.3,270.1L555.7,270L560.3,264.8L563.5,262.9L565.4,266.4L566.1,271.1L569.8,273.9L572.8,278.2L575.6,281.5L571.3,282.5L567.8,283L563.4,284.3L560.2,285.9L556.4,284.4L552.6,284.3L551.3,288.3L547.6,287.6L544.5,292.4L542.8,288.9L540.2,284.2L540.4,279.2L542.4,275.3Z"/>
+<path d="M323.2,144.8L327.7,145.2L321.8,145.4Z M328.3,136.3L323.4,135.3L328.2,135.7Z M156.9,138.3L151,137.2L147.6,134.9L144.3,133.4L148.1,132L151.6,133.5L155.8,136.5Z M344.1,131L347.4,135.6L351.5,135.8L353.8,141.5L351.3,144.6L349.3,140.8L346.1,143.7L340.8,141.4L335.4,141.3L337.8,136.2L340.7,130.9L344.8,127.9Z M131.4,119.9L133.2,123.4L129.9,120.5Z M272.5,91L269.3,92.8L272.6,90.3Z M263.4,81.1L267,83L273.2,85.1L277.5,87.6L270.7,87.8L266.4,88.1L262.4,89.8L257.7,88.2L260.5,83.9L263.4,81.1Z M289.3,76.2L285.5,74.7L289.2,72.4Z M234.3,69.6L228.8,69.8L222.8,68.7L227.2,66.2L231.8,67.7Z M248.5,68.3L252.2,69.1L255.5,71.3L257.4,76L260.3,73.6L262.4,67.1L266.4,67.3L270.5,67.8L274.2,69.5L272.3,72.9L268.5,78.6L264.6,79.1L260.9,79.8L258.2,82.6L254.2,86.3L250.2,86.6L247.9,90.1L241.2,93.3L238.2,97L237,103.5L241.1,104.1L243.6,109.7L247.5,109.1L252.7,110.5L257.4,113.3L260.9,114.3L268.4,115.9L271,119.1L273.9,126.1L278,129.3L281.7,124.8L280.2,119.5L282.7,116.2L285.8,113.9L287.2,109.3L281.9,104L285.2,100.5L283,92.3L289.7,92.4L294.9,91.9L300.9,94.9L306.7,96.5L307.5,103.5L312.1,106L316.1,104.1L318.8,100.4L322.8,101.9L326.4,106.1L329.5,110.1L332,114.1L339,116.8L341.8,120.7L345.1,122.4L343.3,127.4L336.7,129.8L333.2,132.5L328.5,133.1L322.6,132.4L318.4,132.3L313.2,135L309.7,136.4L305.7,140.9L302.5,143.9L309.3,139L315.1,136.2L319.3,135.9L320,143.4L324.5,147.5L329.1,147.1L331.9,143.3L333.9,146.9L330.4,149.1L324.3,151.1L318.4,154.8L321,149L316.6,149.1L311.7,147.7L311.7,143.1L307.7,141.8L304.7,147L301.7,149.2L296.3,150L292,150L287.8,153L284.1,154.6L280.1,155.1L277.1,158.8L271,161.1L271,156.7L271.3,151.9L267.8,147.3L264.5,144.5L259.8,141.5L254.5,139L251.1,140L247.7,139.1L242.8,138.5L238,137.8L229.9,136.7L220.4,136.7L211,136.7L202.6,136.7L194.3,136.7L186.1,136.7L177.6,136.7L166.7,136.7L158.8,136.7L153,133.4L146,130.6L144.9,125.6L141.3,124.1L137.5,119L138.9,113.6L134.1,111.5L131.3,107.7L127,103.8L123.7,100.7L118.2,103.7L113.8,100L108.3,99L108.4,80L108.4,67.6L113.6,68.4L117.9,70L123.3,68.9L126.6,67.9L130.8,68.3L134.9,66.9L139.5,66L143.4,66.6L150.7,68.4L154.4,66.1L158.2,68.1L162.6,67.3L166.8,68.7L173.3,70L177.1,70.5L183.6,72L179.7,73.7L184.7,74.4L192.2,74L197.6,75.4L199.5,71.2L205.1,70.7L210.2,73.3L218.2,74.5L222.5,74L226.5,74.1L233,72.5L237,73.1L235.3,67.7L232,66.4L235.5,60.3L239.2,60.8L245.8,66Z M182.9,56.3L187.7,56.8L191.5,58.5L194.7,56.8L199.5,61.2L198.9,56.4L204.1,56.4L209,61L214.5,65L219.5,66.6L214.6,68.3L210.4,70.3L205.7,69.4L197.2,70.7L190.2,71.2L185.2,71.5L179.9,69.1L174.1,66.8L180.2,65.9L184.1,66L187.7,65.4L182.4,64.7L176.4,64.9L172.5,64.9L177.5,62.3L173.2,62.3L168.3,61.5L172.6,57.6L180,55.6Z M209.7,55.3L202.9,55.1L207.6,54.5Z M287.9,56.3L282.2,57.1L278.4,57.3L275.5,54.4L283.2,54.5L287.9,56.3Z M259.5,56.1L264.3,55.5L271.3,54.2L276.1,57.6L281.2,58.8L290,59.2L293.8,60.8L299.3,61.5L308.9,64.9L314,69.4L308.9,70.9L315.4,73.1L319.8,73.8L323.8,76.9L328.2,77.1L322.4,83.3L319,81.9L314.7,78.7L311.1,79.1L313.6,83L317.4,84.5L320.4,88.7L315.9,90.2L308.9,87.5L312.9,90.4L316.2,93.6L308.7,92.2L302.7,90.3L299.3,88.7L296.2,86L292.1,84.4L284.1,85.9L288.8,82.2L294.6,81.8L298.2,75.7L292.1,71.5L286.5,70.4L282.9,67.2L279.2,67.1L274.2,67.5L264,66.8L258.2,65.8L253.7,65.3L250.3,62.6L251.6,56.2L261.6,54Z M221.2,53.9L229.5,54.1L231.8,58.1L226.8,62.4L222.2,60.9L215.3,58.3L221,57.6L217.9,55.5L221.2,53.9Z M241.1,57.4L238.1,59.9L233.2,56.9L237.5,52.9L243.3,53L248.6,53.8L244.4,56.8Z M165.4,62.1L158.1,63.7L150.2,60.4L153.3,56.6L153,52.4L162.4,51.8L166.4,52.5L173.5,52.7L179.1,55.1L175.6,55.9L168.8,58.3L165.4,60.6Z M240,50.1L234.4,51.1L231.1,50.2L236.5,47.8L240,50.1Z M226.4,44.3L228.6,47.5L222.8,50.3L219.8,47.9L215.3,48.1L218.1,45.6L222.3,44.5L226.2,44.7Z M199.4,46L203,46.6L206.4,48.4L195.3,50.5L188.3,51.9L184,52L189.5,49.5L176.9,49.9L173,49.3L176.8,46L187.2,46.2L192.2,48.2L197,48.4L193.1,45.2L198.5,44.4Z M237,43L245.5,44.1L250.5,47.2L256,48.1L260.1,48.4L264.5,47.7L270.1,47.4L274.6,47.6L278.2,50.3L272.4,51.9L268.8,51.5L260.8,52L255.1,52L250.7,51.6L243.3,50.5L239.2,45.6L233.4,45.2L237,43Z M177.2,41.2L174.7,44.9L166.9,46.5L162.5,47L158.7,46.3L163.5,43.8L169.2,41.6L173.4,41.7L177.2,41.2Z M239.3,41.6L232.9,41.5L237.7,40.6Z M193.9,41L188.7,42L184.6,40.9L190.9,39.5L194.8,40Z M195.4,38L192,38.6L187.4,38.6L191.8,37.3L195.4,38Z M233.8,39.8L229.7,40.5L226.2,38.5L229.6,37.2L234.6,38.6Z M222.1,38.9L218.6,39.9L214,38.9L207.8,38.7L212.4,36.1L219.9,37.3Z M258.3,34.5L261.6,35.5L257.8,36.5L252.7,39L247.8,39.3L242,38.9L239.1,36.3L233.1,34.3L235.2,30.3L243.3,29.1L246.9,30.9L251.5,31.6L256.1,32.3Z M309.7,23L317.1,23.2L323.1,23.7L328.2,24.6L321.3,26.9L314.6,27.6L318.1,28.3L311.6,30.3L307,31.3L302.3,34L296.5,34.6L286.4,35.6L290.2,36L287.9,39.4L283.6,40.3L278.4,42.6L283.6,43.3L276.2,46.1L269,45.2L260.8,45.7L256.7,45.3L251.4,45.1L256.2,42.7L264,41.5L260.2,39.4L255.7,38.8L262.8,36.7L259.7,34.2L266.1,32.6L272.6,31.8L266.4,31.4L256.7,31.6L251.8,30.5L246.2,28.2L249.7,26.4L258.4,25.7L262.5,24.5L265.9,24.7L271.1,23.8L274.7,23.3L279.7,22.9L288.2,22.8L297.7,22.6L303.7,22.8L309.7,23Z"/>
+<path d="M526.7,141.6L528.8,145.1L524.9,146.5L521.5,147.3L518.1,145.2L520,141.8L523.7,140.6Z"/>
+<path d="M309.3,475.5L309.4,482.9L314,483L310.7,485.4L305.7,484L299.3,481.7L292.6,476.1L298.8,479.1L302.5,480.2L304.8,476.4L309.3,475.5Z M310.5,371.6L311.6,376.2L313,380.1L310,387.3L308.3,391.7L305.5,397.9L304.1,404.6L305.3,410.3L304.5,417.2L302.4,422.2L303.3,428.5L300.9,432.7L300.7,440.2L300.2,444.7L302.2,449.3L300.2,456.3L299.1,460.8L296.1,464.4L297.3,469.1L300.2,473.4L306.9,473.8L303.2,476.3L298.5,478.4L295.3,476.1L291.8,474.2L290.3,467.9L290,462.2L294.1,456.5L289.9,455.5L292.5,452.5L293.5,447L298,441.3L295.3,444.6L294.4,439.3L295.3,433.1L295.8,427.6L298.5,418.4L300.4,413L301.6,408.1L300.9,403.1L301.4,396.2L303,392.1L303.5,385.7L304.4,378.8L305.3,371.3L305.1,365.9L304.5,361.2L308.1,360.9L309.9,364.7L310.5,371.6Z"/>
+<path d="M806.5,237.7L801.8,238.3L803.1,233.9L807.7,233.1L806.5,237.7Z M854.6,134.1L859.4,135.2L862.7,137.6L868.1,140.7L875.1,138.4L872.5,142.6L869.7,149.5L866.3,148.9L864.7,153L862.9,157L855.7,160L850.5,163L847.4,164.8L841.3,167.9L836.3,170.3L839.4,165.3L835.5,164.7L832.3,167L827.9,169.3L830.2,173.7L835.6,173.8L839.9,175.2L836.4,177.8L832.4,181.3L834,185.5L836.7,191.8L838.6,196.8L838.7,203.3L834.4,209.8L832.2,214.2L829.6,218.2L825.8,221.3L821.9,224.1L817.1,225.9L810.7,228.2L806.8,232.2L801.5,227.6L797.3,227.3L793.9,223.4L790.2,223.9L785.3,224.3L782.8,229.4L778.9,228.1L775.7,226.3L774.1,219.8L771.5,216.4L774.1,213.6L774.1,208.3L770.4,205.8L767,201.8L762.7,202.4L759.5,204.5L754.7,207.4L750,205.7L746.7,209L741.5,206.8L736.1,204.5L733.1,202.3L728.7,199.6L721.4,197.1L717.9,191.3L719.2,185.6L716.2,181.7L711.6,180.3L708.8,176.2L708,172.1L704.7,168.6L707.7,165.4L712.6,165.2L717.2,162.7L722.6,159.6L724.6,156.1L722.1,150.3L727.6,148.9L731.1,142.2L736.6,143.3L738.2,138.5L742.7,136L746.8,139.8L750.8,141L751.6,147.6L755.9,149.6L759.7,150.1L763,152.2L766,155.6L770.7,157.5L776.4,158.3L780.1,157.8L787,160.3L791.6,161.3L794.8,159.6L799.3,158.4L803.5,158.3L808.7,155.3L810.8,149.7L815.2,150.6L822.2,147.6L826.2,144.4L830.2,144L828,139.8L823.1,140.5L822.8,136.2L827.4,135L831.4,132.9L833.8,127.9L836.1,122.5L839.6,121.9L843.3,121.8L847.4,122.8L851.6,127.4L853.6,130.9Z"/>
+<path d="M492.1,283.4L487.1,282.8L481.9,284.3L478.6,285.5L479,281L476.1,278.4L476.6,274.4L477.6,268.7L481,266.2L485,265.4L488,268L492.1,267.9L492.9,272.6L491,279.2L492.1,283.4Z"/>
+<path d="M536.3,292.4L532.6,292.2L526.8,292.4L526.1,287.6L523.6,284.1L525.6,278.5L529.2,276.5L532.6,276.7L533.9,272.3L536,268.6L537.7,264L540.2,260.3L543,266.7L539.4,266.6L541.6,270.7L542.4,275.3L540.4,279.2L540.2,284.2L542.8,288.9L544.5,292.4L539.8,292.6L536.3,292.4Z"/>
+<path d="M585.6,288.3L586.6,292.7L583.6,296.5L582.8,300.7L581.4,305.4L580.6,309.5L581.5,315L581.7,319.8L583.9,323.6L585.4,327.8L580.6,328L579.6,332L578.8,339.3L582.3,340.6L580.4,344.2L578.2,340.9L573.8,339.7L570.6,337.8L566.4,336.4L562.2,336.6L560.8,331.7L560.4,326.4L557,324.3L553.2,325.8L548.5,326.9L546,322.1L537.2,319.5L537.8,315L542.1,314.5L544.4,309L546.8,304.1L549.1,300.2L549.7,294.2L551.1,290.3L551.5,286L554.1,283.2L558.1,285.6L562.2,286.6L567.8,283L571.3,282.5L575.1,282.9L579,285.7L582.5,284.7L585.6,288.3Z"/>
+<path d="M536.1,315.9L530.8,313.3L531.9,309.2L534.9,306.5L538.9,308.2L539.8,301.8L539.7,296L536.1,293.9L539.8,292.6L544.3,294.2L545.9,289.3L549.5,288.1L550.3,292.1L549.4,297.1L549,301.4L545.6,305.8L544.5,311.8L540.5,316.6L536.8,316.3Z"/>
+<path d="M290.6,300.5L287.3,299.1L284.3,297.2L281,295.4L282.1,291.2L285.8,287.2L284.6,281.4L283.7,275.9L284.8,271.6L288.6,268.9L290.3,264.6L293.7,263L298.3,260.9L301.7,258.7L299.4,263L297.1,267.5L298.8,272L300.1,276.7L303.7,276.4L307.3,279.7L312,279.1L311.6,285L313,288.9L314.2,295.8L306.1,294.3L307.6,298L307.2,303.7L305.9,314.3L305.4,309.1L301.6,307.8L297,307.7L294.1,303.3L291.4,300.2Z"/>
+<path d="M269.5,272.6L266.9,269L264,266.4L261.3,263.7L264.8,263.1L268.3,265.3L269.6,269.8Z"/>
+<path d="M271.5,222.7L276.1,223L279.8,225.3L283.4,225.7L287.4,229.3L291.9,231L288,233.5L284,233.8L282,229.9L277.2,227.2L272.7,226L268.1,226.1L264,227L267.3,224L270.8,223.1Z"/>
+<path d="M590.9,182.9L596,181.1L593.1,183.2Z"/>
+<path d="M594.4,183.1L590.3,184.3L593.5,183.3Z"/>
+<path d="M547.1,138L542.4,136.5L537.8,137.1L534.8,134.8L537.1,130.9L540.5,130L545.1,131L548.8,132.1L552.4,135L548.7,137.3Z"/>
+<path d="M527.6,116.7L530.4,120L534.8,118.4L539.2,120.8L540.8,126.4L539,130.2L534,132.4L536.2,135.6L536.2,141.2L531.7,141.6L527.5,141.4L523.7,140.6L522.5,136.6L518.5,136L517.1,130.7L519,125.9L519.2,121.7L524.4,119.9L527.6,116.7Z"/>
+<path d="M619.7,257.7L619.8,261.8L616,263.2L617.6,258.2Z"/>
+<path d="M535.3,114.6L530.7,115.5L534.4,113Z M530.3,111.8L526.8,115.1L523.7,116.8L522.5,111.5L526.2,109.4L529.4,107.6L530.3,111.8Z"/>
+<path d="M300.8,234.3L305,234.6L308.9,236.7L305.7,238.6L301.7,241.3L301,236.1Z"/>
+<path d="M533.3,221.8L523.8,228.1L515.8,234.7L511.9,236.1L508.7,234.4L505.1,231.3L495.7,224L486.3,216.8L475.9,208.7L475.9,203.9L480.4,201.4L485.4,200L489.7,197L492.7,193L496.4,192.5L495.2,186.9L494,182.8L499.6,180.4L504.1,178L508.8,177.4L513.4,177.1L517.4,176.3L521.5,177L523.3,181.7L520.9,186.3L523.4,190.8L526.3,199L527.4,203.5L527.1,207.7L525.9,213L527.6,216.9L532.1,219.7Z"/>
+<path d="M276.9,311.3L277.8,307.4L275.2,303.5L277.7,298.8L281,295.4L284.3,297.2L287.3,299.1L290.6,300.5L290.2,305.2L287.1,308.7L283.8,310L281.6,315.2L277.7,314.5Z"/>
+<path d="M597,201.7L595.6,205.5L592,205.3L590.1,200.5L592.6,207.7L594.7,212.9L596.7,216.6L599.1,220.2L601.9,226L591.4,226.7L580.6,226.7L569.4,226.7L569.4,214.4L569.4,202.5L569.3,197.8L573.6,194.7L579,196.6L582.5,196L586,194.8L589.4,195.8L593.8,196.8L597,201.7Z"/>
+<path d="M617.6,258.2L614.3,254.1L611.2,251.6L607,251.6L601.2,251.9L602.1,245.7L605.3,241.9L608.3,243.9L610.6,248.5L614.4,251.7L617.4,255.5Z"/>
+<path d="M474.9,160.4L477.8,154.2L481.2,154.8L485,154.8L490.2,155.1L494.7,155.3L500.9,158.1L505.1,158.9L508.4,160.4L502.3,163.3L499.2,169L498.1,174.5L494,177.8L490.5,177.8L486.1,178.9L482.7,178.8L479.3,176.3L479.5,172.1L479.2,167.9L481,163L477.7,160.7Z"/>
+<path d="M567.5,107.4L564.8,102.7L568.3,101.8L571.8,101.3L577.7,101.7L577,107.4L573.5,108.4L569.9,106.8Z"/>
+<path d="M605.3,250.1L609.3,251.6L613.6,252.9L616.7,257.1L615.7,261.2L618.8,263.6L620.3,268.2L630.4,273.3L624.9,283.3L621.3,283.5L617,285.9L613.2,285.8L609.9,288.6L605.9,288L602.4,285.2L599.5,282.2L596.4,278L593.2,274.3L594.3,268.1L596.5,263.6L597.9,259.7L600.8,254.8L604.4,252.6Z"/>
+<path d="M579.4,69.8L583.3,74.3L583.9,80.6L584.6,86L587.5,90.4L583.9,94.1L578,98.3L572.9,98.6L568,99.8L563.5,100.5L559.2,97.6L558.5,91.3L562.3,87.3L568.7,83.7L566.4,80L565.4,73.5L561.1,71.3L557.3,69.6L562.1,70.5L565.7,70.4L571.4,69.7L577,66.1L580.6,67.4Z"/>
+<path d="M995.5,357.8L992.7,360.5L995.5,357.8Z"/>
+<path d="M330,472.8L333.3,470.8L337.4,470.3L335,474L331.4,474.3Z"/>
+<path d="M510,132.1L513.3,133.4L516.4,135.2L522.5,136.6L520.7,141.3L516.8,144.2L518.9,147.6L519.5,152.5L512.7,155.3L508.6,156.4L505.1,158.9L500.9,158.1L495.8,156.6L496.7,146.6L493.8,143.1L487.5,140.2L490.8,137L495.5,137.9L503.7,132.9L507,129.5L510,132.1Z"/>
+<path d="M530.8,313.3L528,309.9L524.4,303.7L525.8,299.1L531.3,296.5L532.6,292.2L536.3,292.4L539,295.3L538.5,299.9L540.1,304.4L536.4,308.1L532.8,308.4L530.8,313.3Z"/>
+<path d="M484.3,118.2L480.7,119.8L479,116.2L484.3,118.2Z M491.7,104.6L488.7,108.2L494.6,107.7L491.3,113.4L496.9,117.9L500.5,122.2L504.7,124.2L504,129L497.8,130.8L493.1,131.7L487.4,132.2L484,132.8L488,129.3L485.4,126.7L487.3,121.7L491.4,122L490,118L486.5,117.4L484.3,112.4L483.9,107.3L488.3,104.8Z"/>
+<path d="M615.4,161.5L613.5,156.6L617.8,155.9L621.5,157.5L626.3,158.3L629.5,162.7L625.6,162L621.1,163L615.4,161.5Z"/>
+<path d="M502.9,280.2L498.6,282.2L494.5,284.3L491,279.2L492.9,272.6L492.1,267.9L491.8,263.5L496.7,263.3L500.1,263.3L501,268.4L501.4,275.3L502.9,280.2Z"/>
+<path d="M476.6,274.4L472.9,271.5L469.9,267.7L466.2,267.1L463.2,270.3L460.9,267L458.8,263.7L461.4,261.1L465.3,258.9L468.6,259.7L472.5,259.8L476.7,262L477.7,266L478.2,271.4Z"/>
+<path d="M453.2,256.2L456.6,254.6L460.1,254.6L456.4,255.8Z"/>
+<path d="M458,263.2L454.7,260.6L461.9,258L460,261.6Z"/>
+<path d="M526.4,296.6L526.8,292.4L531.3,292.5L527.3,296.4Z"/>
+<path d="M565.8,181L569.5,181.9L573,182.3L568.7,183.6L565.3,182.4Z M573.9,161.5L570.7,163.8L565.9,164.4L563.5,167.8L565.4,171.6L563.3,175.6L559.2,174.5L557.6,170.8L557.3,166.3L560.2,163.6L563.8,162.2L568,161.4L572.5,162.2Z"/>
+<path d="M370.1,24.6L379.4,22.6L389.2,22.7L392.7,21.5L402.5,21.2L424.7,21.6L442.1,24.2L437,25.5L426.3,25.7L411.4,26L422.6,26.2L431,27.4L436.4,26.4L442.7,28.3L456.2,27L464.5,27.6L454.8,31.4L444.3,32.7L450.7,32.9L447.5,35.3L445.4,41.2L448.7,43.4L444.3,43.5L439.8,44.6L444.9,46.3L442.6,49.5L446.2,52.3L440,52.6L443.2,53.9L438.4,55.6L434.5,55.6L438,57.9L432.6,58L438.5,61.8L434.6,65.1L429,61.9L426.8,65.9L434.1,66.1L437.9,66.2L430.5,69.1L422.9,71.8L414.8,72.9L408.9,74.2L405,77.7L399,80.1L393.4,81L389.4,81.8L387,86.2L381.1,91.1L380.9,96.4L375.6,99.9L371.5,97.2L365.9,97.1L361.4,92.1L356.6,87.9L354.8,82.7L350.9,79.7L352.8,72.1L357,70.9L358.7,66.9L354,68.6L348.1,68L349,63.9L357.2,64.8L352.5,62.7L347.2,62L346.3,56.8L340.8,51L337.2,49.7L329.8,46.3L323.9,46.1L316.5,46.2L309.7,46.5L301.7,43.3L309,42.3L314.5,42.1L302.7,41.2L296.4,39.9L307.3,37L317.5,35.4L311,32.9L323.1,29.3L327.1,28.9L332.5,26.6L341.1,26L349.6,26L360,25.2L366.7,26.5L370.6,26.7L376.3,27.8L369.7,26Z"/>
+<path d="M249.7,254.2L245.3,252.9L243.8,249.2L248.7,246.4L246,242.5L249.8,240.6L252.1,247L251.8,251.9Z"/>
+<path d="M354,291.7L350.6,292.1L350,287.9L348.7,283.7L353.1,282L356,284.8L354.9,289.2Z"/>
+<path d="M334,272.1L337.5,275.5L340.2,278.9L340.8,283.1L338.8,286.5L341.2,290.8L338.6,295L334.3,294L333.8,288L333.4,283.3L329.4,280.1L331.8,277.1L334,272.1Z"/>
+<path d="M257.5,256.7L255.4,253.5L251.8,251.9L254.9,247.6L258.6,247.5L262,246.8L265.6,247.2L269,250L265.4,251.3L261.9,253.5L259.1,255.8Z"/>
+<path d="M552.3,147L549.6,149.8L545.9,149.3L547,154.4L551.6,157.8L547,156L542.2,152.5L539.6,149.2L543.5,147.2L546.9,145.4L551.3,147.5Z"/>
+<path d="M296.7,233.6L300.8,234.3L300.9,238.9L296,239.3L297.8,235.1Z"/>
+<path d="M545,143.8L547.2,139.6L551.9,140.4L556.2,138.9L560.8,138.9L560.1,143.4L556.2,146.2L552.3,147L546.9,145.4Z"/>
+<path d="M835.3,334.1L830.5,331.9L834.5,332.2Z M845.7,333.8L847.1,329.6L845.7,333.8Z M827.5,327L830.9,329L825.8,330.1Z M841.4,327L836.8,329.8L833.1,329.4L837.1,328.5L841.4,327Z M801.7,322.6L807.1,322.9L812.8,323.2L818,325.9L821.4,327.9L815.2,327.8L809.8,327.7L804,325.8L795.7,324.5L794.6,319.7L800.2,321.2Z M853.5,311.5L850,310.6L853.5,311.5Z M862.4,310.3L858.8,311.2L855.3,311.3L859.4,309.3Z M872.6,303.8L873.4,309.2L878.6,307.7L881.8,305.7L886.6,306.8L891.7,308.7L891.7,319.5L891.8,330.4L886.5,327L882.3,328L885.2,324.4L883.1,318L877.7,315.2L871.3,311.8L866.6,309.4L871.6,308.3L867.3,307.4L863.7,304.8L867.7,301.2L872.2,302.6Z M847.9,295.3L845.7,298.6L840.9,298.6L836.3,298.7L833.4,301.7L835.9,304.7L842.6,302.1L840,305.1L840.2,310.6L842.1,315.6L838.2,316.2L835.8,312L834.5,318.4L832.4,314.9L829.9,309.3L831.5,304.5L832.8,299.5L835.8,295.6L841.5,297.1L847.4,294.5Z M857.5,296.2L855.5,300.8L853.9,296.6L855.4,292.8L857.5,296.2Z M827.4,293.9L830.5,297L826.3,299.7L823.8,305L822.6,313.4L819.1,313.7L816,311.5L811.3,311.6L806.2,309.8L805.8,305.3L803,301.5L803,295.5L807,297.4L810.5,297L816.1,295.9L819.8,290.6L821.8,285.6L827.5,286.2L827.9,292.4Z M793.9,319.5L788.5,316.8L785,314.1L781.7,309.3L778.2,302.2L774.9,296.5L771.4,291.8L767.8,287.1L764.9,283.4L770.8,282.5L773.2,285.8L776.9,289.4L779.6,293L784.7,295.3L788.4,299.7L789.9,303.6L791.4,307.8L794.7,310.2L794,314.4L793.9,319.5Z"/>
+<path d="M716.2,181.7L719.2,185.6L720,190L718.7,194.9L725.3,199.4L722.5,204L727.8,206.9L731.4,208.8L735.2,209.2L739,211.2L742.3,212L744.6,208.5L749.3,210.9L753.4,210.6L757,207L762.7,202.4L767,201.8L770.4,205.8L767.8,209.1L764.2,211.4L762.8,216.1L761.4,220.5L758.5,224.3L756,221.2L756.6,216.7L752.4,216.2L749.5,213.4L746,211.8L747,215.9L745.9,221.2L747.3,226.5L741.6,228.3L740.3,232.8L736.3,235.1L733.2,239L728.3,243.3L724.4,246.8L722.9,253.9L721.8,259.8L721.8,265.5L719.1,268.2L716.5,272.5L712.8,270.3L711.5,265.7L709.4,260.7L707.3,253.4L704.3,246.7L703.1,240.2L702.3,236L701.8,228.8L697.7,230.8L692.1,226.4L689.4,221L697.3,218.8L695.2,214.3L693.1,210.2L696.2,206.7L702.3,203.5L706.7,196.7L709.1,192.4L705.8,188.5L706.2,184.2L710.4,185L716.2,181.7Z"/>
+<path d="M482.8,120.4L481.1,125.8L476.2,127.8L472.3,127.3L474.5,123.8L476.9,117.8L480.7,119.8Z"/>
+<path d="M649.8,176L654.2,173.5L659.3,173.2L664.5,175.3L667.7,178.2L668.9,185.3L668.2,190.1L669.3,194.8L669.1,200.6L671.6,204.3L674.3,208.7L671.9,212.5L665.6,215.4L659.4,214.2L658.3,210.1L654.8,210.1L648.6,210.6L645.8,208.1L641.3,204L639.2,199.5L634.9,200.2L632.5,196.7L631.5,191.8L628.1,189.9L626.8,184.2L626.2,180.1L624.4,176.1L622.5,168.6L626.3,170.4L632.5,168.3L635.1,172.4L639.3,175.4L645.2,177.7L649.5,176.8Z"/>
+<path d="M626.2,180.1L626.8,184.2L628.1,189.9L631.5,191.8L632.5,196.7L634.9,200.2L631.4,199.8L624.2,202.7L616.4,196L612.2,193.7L608.9,192.8L607.8,188.7L613.9,185.3L615,181.2L617.6,175.9L622.1,175.8L626.2,180.1Z"/>
+<path d="M459.7,78.5L462.2,82.9L458.6,85.5L450.6,87.7L444.5,87.9L436.8,86.8L433.5,83.7L438.4,83.1L432.4,81.3L438.5,78.6L442.8,80.9L447.1,79.1L450.6,80L455.1,78.2L459.7,78.5Z"/>
+<path d="M599.2,191L597.1,194.6L597,201.7L595.2,195.9L597.1,190.6Z"/>
+<path d="M543.1,172.6L541.9,177.9L538.4,176.3L534.5,174.6L538.2,173.2L543.1,172.6Z M525.6,162.6L526.9,169.4L523.4,169.4L522.7,163.5Z M534.4,144.1L538.4,145L534.2,148.7L535,153L539,157.5L542.1,160.1L546.6,162.7L551,165.5L546.9,165.2L547.4,170.3L544.7,173.4L543.7,168.2L540.8,164.7L535.8,162.5L531.1,158.8L528.3,153.6L524.7,152.1L520.7,154.4L518.7,149.9L521.5,147.3L524.9,146.5L528.8,145.1L533.8,142.9Z"/>
+<path d="M284.5,238.4L287.9,239.5L284,240.5Z"/>
+<path d="M598.7,192L602.3,192.3L607.8,188.7L608.9,192.8L602.8,195L605.6,198.3L602.1,200.4L597.1,202.1L598.4,196.3L598.7,192Z"/>
+<path d="M874,186.2L870.2,189L872,185.5Z M891.6,176.2L891,180.5L886,184.4L881.2,184.6L877.2,188.5L875.2,184.7L870.4,185.4L867.1,187L864.8,195.2L862.4,192.3L859.5,189L863.6,185.9L868.4,181.9L873.9,180.9L879.8,175.7L885.7,173.9L889,168.5L889.7,162.7L894.2,166.7L891.6,172.8Z M899.8,152.8L903.7,152.1L900.2,156.7L897.7,160L893.4,157.7L888.8,161.4L889.8,155.6L893.5,150.8L897.6,151.6Z"/>
+<path d="M697.1,159.1L691.9,162.1L685.3,162.8L683.6,156.7L680.3,154.2L675.5,154.5L669.6,152L663,148.3L655.4,150L655.5,162.3L652.1,159.9L647.1,159.6L642.6,156.2L639.8,152.4L642.5,149.2L647.3,149.1L647.3,143.8L642.2,143.2L639,144.6L635,144.8L633.5,140.9L629.1,138.7L632.1,131.8L641,127.7L645.4,127.6L651.5,129.9L654.8,131.3L662.1,129.8L665.7,131.5L670.4,130.7L666.6,126.8L671.4,123.4L681.1,118.8L689.4,116.8L696.8,116.1L700.6,118.7L704.2,119.9L713.6,118.4L716.1,122L722.3,130.5L727.6,130.6L731.6,129.8L734.5,132.3L737.6,134.4L741.2,133.9L740.6,138.2L738.1,141.8L731.1,142.2L729.1,148.2L722.1,150.3L724.6,156.1L721.2,158.3L715.7,156.8L711.1,156.7L706.1,155.7L699.6,157.2Z"/>
+<path d="M613.9,302.9L613.6,306.9L611.4,310.9L608.9,315.6L604.9,312.3L594.6,303.5L594.9,298.3L597.3,293.6L596.1,289.8L594.5,285.8L598.1,281.6L600.4,285.2L605.9,288L609.9,288.6L613.2,285.8L613.8,290.7L613.9,302.9Z"/>
+<path d="M697.1,159.1L704.1,158.3L710.1,157.1L715.7,156.8L719.8,157.1L722.9,158.8L718.2,161.4L713.6,163.1L709.6,164.8L705.1,167L699.4,169.1L696,168L699.4,166.2L702.9,163.8L699.6,162L695.6,161.6Z"/>
+<path d="M787.5,264.6L785,259.4L784.3,255.4L789.7,251.9L794.6,253.7L798.3,252.7L798.6,258.9L793.9,261.4L789.8,265Z"/>
+<path d="M856.5,171.3L858.9,175.2L859.6,181.2L856.1,183.7L851.3,185.4L851.6,181.1L852.4,177L853,172.5L856.5,171.3Z"/>
+<path d="M633.3,200.1L634.5,204.8L629.4,203L633.3,200.1Z"/>
+<path d="M792.3,252.4L793.3,248.1L790.9,241.9L786.7,239L780.7,241.6L781.3,235.1L778.1,231.9L781.1,228.5L783.8,225.1L786.7,230.8L790.1,230.8L788.6,235.8L791.9,237.8L794.2,241.7L798.1,247L798.3,252.7L794.6,253.7Z"/>
+<path d="M599.5,189.1L599.9,184.6L599.5,189.1Z"/>
+<path d="M478.6,285.5L475,283.9L470.1,279.5L469,275.3L471.6,272L474.4,275.6L476.9,279.4L478.6,285.5Z"/>
+<path d="M541.3,223.8L537.7,223.2L533.3,221.8L529.9,218.1L525.9,213L527.1,207.7L527.4,203.5L526.3,199L529.5,194.1L531.9,189.5L536.3,190.4L542.3,192.4L546.1,196.1L550.1,197.5L554.4,198.2L555.1,194.2L557.9,191L563.6,191.2L569.2,193.7L569.3,197.8L569.4,202.5L569.4,214.4L569.4,226.7L569.4,233.3L566.2,234.7L555.1,228.3L544.1,222Z"/>
+<path d="M727.2,274.9L725.6,279.3L721.9,277.5L721.4,272.7L722.6,267.3L725.8,271.5Z"/>
+<path d="M580.5,396.5L578.6,400.8L575,399.6L578,396.2Z"/>
+<path d="M563.1,118.9L559.1,116L561.7,112.2L566.3,112.4L570.9,113L573.9,116.1L570.9,119.1L565.2,120.3Z"/>
+<path d="M558.5,113.2L559.9,108.6L564.8,110L567.5,107.4L571.1,107.2L575.8,108.4L578.3,112.8L573.6,114.6L569.4,112.8L561.7,112.2Z"/>
+<path d="M485.6,180.8L489.9,182L494,182.8L495.2,186.9L496.9,191.2L492.7,193L489.7,197L486.5,198.3L483.2,200.9L475.9,203.9L475.6,209.6L471.7,210.5L467.4,213L465.3,217.4L461.4,221L460.5,225.6L452.8,228.6L454.8,224.4L457.1,218.8L458.9,214.5L461.7,211.3L464.9,206.5L469.7,203.9L473.4,200.2L472.7,196.1L474.2,191.5L478.7,187.7L482.7,182.8Z"/>
+<path d="M573.9,139.3L578.5,139.5L581.7,142.2L579.6,146.9L576.5,142L573.9,139.3Z"/>
+<path d="M637.6,341.6L639.5,349.2L639.4,353.3L637.5,357L636.2,363.7L634.9,368.3L633.1,374.6L632.1,379.3L630.8,383.1L626.1,385.3L622.3,383.3L621.4,378.6L620.2,373.5L621.9,369.4L623.5,364.8L622.1,358L623.5,354.1L627.4,352.6L632.5,348.6L635.7,343.6Z"/>
+<path d="M230.2,213.8L228.6,219.1L228.4,223.6L229.5,228.6L231.9,233.7L233.6,237.2L237.7,239.5L242.3,238.3L246.1,237.1L248.5,233.8L251.1,229.1L256.5,228.5L257.3,232.5L256.7,236.5L253.2,240.4L247.2,240.6L248.3,245.1L243.8,249.2L239.2,246.9L235.4,246.2L231.8,247.8L227.7,246.3L223.1,244.3L217.6,241.2L212.5,239L208.4,235.6L206.3,231.9L206.7,227.1L203,220.8L200.2,218.2L196.5,214.7L193.4,209.5L189.6,205.1L186.6,199.9L183.7,194.8L181.5,199.5L184.5,203.1L186.8,207.4L190,211.1L191.7,215.7L194,219.1L196,222.7L191.8,220L188.4,217.5L188.1,213.3L184.8,210.8L180.4,207.6L182.9,204.8L179.1,201.5L177.1,197.2L174.6,191.5L181.3,190.9L185.3,193.2L191.6,195.6L197.1,195.5L204.1,194.2L208.2,197.9L211.3,202.4L215.3,200.8L219.6,202.1L221.9,206.3L224.2,210.5L227.1,213.1Z"/>
+<path d="M557.2,160.5L560.9,159L563.8,162.2L560.2,163.6L556.8,161.6Z"/>
+<path d="M466.2,251.3L470.4,249.6L484.6,248.3L483.4,231.2L482.1,216.8L486.3,216.8L495.7,224L505.1,231.3L508.7,234.4L511.9,236.1L511.9,243.8L510.1,248.1L503.8,248.9L499.3,250.3L494.4,251.5L491.8,254L488.1,255.9L485.5,261L485,265.4L481.5,265.2L478.1,265.7L475.6,260.6L471.8,260.5L468.2,259.7L466.9,255.3Z"/>
+<path d="M776.5,232.7L772.9,234.3L770.5,238.5L773.6,243.9L773.7,249L775.3,253.9L776.6,260.4L773.8,266.9L774.3,261.9L773.6,256.3L771.6,250.5L771.1,246.3L764.9,247.6L762.6,242.4L759.8,235.4L756.6,231.1L757.4,226.5L759.2,219.7L762.6,217.7L764.3,213.3L767.8,209.1L770.4,205.8L774.1,208.3L774.1,213.6L771.5,216.4L774.1,219.8L776.5,223.5L777.7,227.5L781.1,228.5L778.1,231.9Z"/>
+<path d="M555,158.3L551.3,158.4L553.4,154.9L556.5,157Z"/>
+<path d="M743.8,135.7L752,132.2L756.2,130.7L761.5,131.7L766.2,133.4L770.2,134.2L771.7,130L774.6,126.5L780.2,128.3L784,131.6L788,133L794.1,132L799.6,134L803.9,135.7L807.4,136.2L813.6,134.9L817.7,132.5L824.1,133.7L820.8,139.5L825.8,141L830.2,140.8L832.4,144.4L826.2,144.4L822.2,147.6L817.9,148.9L812.3,150L810.6,154.2L806.7,157.1L799.3,158.4L794.8,159.6L791.6,161.3L787,160.3L782.9,158.3L776.4,158.3L770.7,157.5L766,155.6L763,152.2L759.7,150.1L755.9,149.6L751.6,147.6L752.7,143.7L746.8,139.8L743.8,135.7Z"/>
+<path d="M596,338.4L601.4,339.1L605.1,337.6L609.8,336.3L612.3,339.2L612.8,347.3L611.4,353.7L607.1,357L603.9,358.6L600.8,362.2L597.8,365.2L597.7,370.8L598.7,376.9L597.3,381.6L591.7,384.5L591.2,389.1L588.4,386.1L588.7,381.2L586.6,374.2L589.6,370.4L591,365.7L591.2,359.9L591.2,355.7L587.9,353.6L584.3,352.9L592.3,346.6L595.7,348.7L595.5,353.9L599.4,353L599.1,348.7L597,345.2L595.2,340.9Z"/>
+<path d="M466.2,251.3L462.7,246.5L459.5,244.7L455.2,245.1L455.1,239.6L454.5,234.7L452.6,230L464.1,228.9L463.6,224.1L466.8,222.1L466.8,213.6L475.9,213.7L475.9,208.7L486.3,216.8L482.1,216.8L483.4,231.2L484.8,245.6L473.5,248.4L468.5,248.6Z"/>
+<path d="M596,338.4L596,345.3L599.1,348.7L599.4,353L595.5,353.9L595.7,348.7L592.3,346.6L592.5,341.5L592.5,336L591,330.8L594.3,332.3L596,338.4Z"/>
+<path d="M780.8,279.3L784.4,279.6L787.2,283.8L787.3,288.7L789.6,294.6L784.9,293.4L781.6,290.8L779.7,286.9L778.3,282.3L778.5,277.9Z M829.5,285.1L825,285.6L820.9,289.4L818.4,295.2L813.5,295L808.8,296.7L805.1,295.5L808.8,293.8L813.9,289.7L817.2,284.9L820.6,283.5L822.8,279.5L826.8,278.6L831.1,282Z"/>
+<path d="M545.4,395.3L542.3,390.3L541,384.6L540,379.5L539.6,373.7L537.1,369.6L535.6,365.6L532.8,360.2L535.6,356.5L539.1,358.1L550.7,357.7L559.4,359.8L564.5,358.4L568.6,357.8L565.5,360.9L560.2,360.7L558,372.7L555.3,382.6L555.3,394.9L551.3,396.8L547.8,394.5Z"/>
+<path d="M960.5,370.3L964.2,373.9L959.7,372.3L956,368.1L959.6,369.3Z"/>
+<path d="M506,260.2L502.8,257.2L501.2,253.4L503.8,248.9L507.6,248.6L510.3,246.1L511.9,236.1L515.8,234.7L523.8,228.1L533.3,221.8L537.7,223.2L541.3,223.8L541.9,229L543.6,233.5L542.5,240.2L542.4,244.6L538.8,247.7L537.6,252.1L540.5,255.6L537,254.8L532,255.6L528.1,255.7L521.7,255.5L517.9,255L512.1,254.2L510.2,258.2L506.9,259.2Z"/>
+<path d="M523.6,284.1L519.7,285.1L514.9,283.7L512,279.1L507.5,279.1L507.6,273.8L508.1,269.5L510,265.6L510,261.1L511,256.8L515.1,253.8L518.9,256.3L525,257.2L529.7,255.8L534.2,256.5L538.9,258.5L537.7,264L536.6,267.9L533.9,272.3L532.6,276.7L529.2,276.5L525.6,278.5L523.6,284.1Z"/>
+<path d="M261.9,263L259,259.5L256.8,256.5L259.7,254.1L263.4,252.2L266.7,250.8L268,254.8L267.7,258.9L267.2,263L262.3,262.6Z"/>
+<path d="M516.9,121.6L519,125.9L517.1,130.7L513.8,128.4L509.2,128.8L513.1,123L516.9,121.6Z"/>
+<path d="M578.2,62.7L586.9,65.2L583.3,66L586.4,68.1L581.7,69.5L577,66.1L572.7,67.2L568.7,71.2L562.1,70.5L559,68.8L555.6,69.8L550,71.4L546.6,73.3L542,79.4L537.7,84L533.1,89.6L533.3,94L534.2,99.6L530.6,103.8L523.3,105.6L519.6,106.4L515.7,104.7L513.9,93.4L523.8,88.5L529.2,85L534.3,80.4L541,74L545.7,71.5L553.3,67.3L559.4,65.8L564,66L568.2,63.2L573.3,63.4L578.2,62.7Z M568.7,40.5L562.5,41.9L557.6,41.1L563.6,38.5L568.7,40.5Z M550.7,34.3L559.8,36.8L552.9,38.1L548.9,41.2L544.2,44.1L538.2,42.1L531.2,37.1L536.6,33.3L542.1,34.4L547.2,33.2L550.7,34.3Z M570.7,32L576.1,33.1L572,34.9L564,35.3L555.8,34.8L551.3,33.8L556.8,31.3L560.9,32.1L570.7,32Z"/>
+<path d="M744.8,207.1L744.6,212L739,211.2L735.2,209.2L731.4,208.8L727.8,206.9L722.5,204L725.3,199.4L731.5,201.8L736.1,204.5L741.5,206.8Z"/>
+<path d="M980.6,436.4L984,437.8L981.2,443.2L978.6,446.2L975.5,449.7L971.8,454.5L967.8,455.4L963,454.1L967.5,447.1L971.3,445.2L975.3,441.7L977.6,438.4L980,435Z M985,420.5L987,424L991,426.3L994.5,425.3L994.4,430.6L991.3,433.6L988.9,437.6L985.1,437.6L985.8,433L982.9,430.5L985.4,426.8L984.1,422.4L980.7,417.5L984.2,417.6Z"/>
+<path d="M663.5,229.6L660.6,232.5L660.3,236.9L657,239.7L653.5,241.2L648.8,244.3L644.4,236.7L652.8,233.3L654.6,226.7L654.2,221.6L655.2,216.9L659.5,220.4L663.1,221.4L666.1,224.9L663.5,229.6Z"/>
+<path d="M708.8,176.2L711.6,180.3L716.2,181.7L713.5,184.5L706.2,184.2L705.8,188.5L709.1,192.4L706.7,196.7L704,200.1L699.4,207L693.1,210.2L695.2,214.3L697.3,218.8L691.2,218.8L687.3,220.2L684.4,215.2L679.3,215.9L674.7,215.9L670.8,216.4L675.9,210.8L674.2,205.8L670.5,202.3L676.5,201.8L680.7,201.8L684.3,200.4L685.9,195.7L690.4,194.3L693.6,189.6L696.9,186.7L698.9,182.8L699.6,178.3L705.7,177.2Z"/>
+<path d="M283.7,275.9L282.1,272L279,270.2L276.4,273L273,273L269.5,272.6L269.6,268.4L272.8,270.2L276.3,269.6L280.5,268.2L284.1,270.2L284.9,274.5Z"/>
+<path d="M306.7,358.6L301.7,359.2L296,354.5L291,350.9L287.7,346.1L285.8,340.7L283.1,334.6L280.5,328L278.4,324L274.3,320.5L273.9,315.8L276.9,311.3L278.8,314.8L282.1,312.9L287.1,308.7L290.2,305.2L290.6,300.5L294.1,303.3L297,307.7L300.6,307.2L305.4,309.1L305.9,314.3L300.7,315.3L297.5,317.6L296.9,322.1L294.5,325.1L297.2,330.1L299.5,333.5L304.2,331.6L304,336.7L309.3,341.9L308.5,348.2L307.3,352.2L306.7,358.6Z"/>
+<path d="M851,272L851.5,276L848.2,277.4L845.1,279.5L843.4,273.9L839.1,277L841.5,272.3L846.1,271.6L848.4,267.5L850.9,270.7Z M844.4,265.7L841.7,269.9L841.2,265.8L844.7,262.6Z M829.2,268.9L825.5,272.1L828.9,267.7L832,262.1L830.6,266.7Z M838.6,260.4L842,261.4L838.9,265.2L838.6,260.4Z M848.6,259.5L847.3,263.4L845.2,258.1L848.6,259.5Z M837.6,256.4L834.2,255.1L837.6,256.4Z M837,238.3L840.3,243L838,246.9L838.1,252.2L844.3,254.1L844.7,258.2L841.5,254.8L836.5,254.5L833.5,250.1L833,245.5L834.4,241.3L837,238.3Z"/>
+<path d="M933,322.7L929.8,319.7L933.4,321.8Z M922.2,318.3L918.8,320.3L913.6,320.1L916.7,316.8L921.2,315.9Z M908.9,324.6L913.2,330.3L916.8,332.3L913.7,334.3L908.7,331.6L905.7,326.9L902.1,325.4L898,327.5L896.2,331.1L891.8,330.4L891.7,319.5L891.7,308.7L896.5,311L901.6,312.9L905.1,316.3L910.1,320.3L908.9,324.6Z M925.4,315L922.1,311.5L918.5,309.1L922.9,310.8L925.4,315Z"/>
+<path d="M541.7,129.6L540.1,124.6L541.1,119.8L545.5,118.3L549,117.2L554.6,118.6L558,119L563.1,118.9L566.1,123L565.4,128.1L565.1,132.3L562.6,135.1L558,135.6L553.7,134.8L549,133.2L544.9,131.9L541.7,129.6Z"/>
+<path d="M862.9,158.7L860.2,161.3L858.4,165L854.3,167.5L856.5,171.3L853,172.5L849.1,173.5L848.3,168.7L845.2,166.9L850.5,163L853.7,161.7L860,158.6Z"/>
+<path d="M474.9,160.4L479.4,160.7L480.9,165.6L480.3,169.9L480.1,174L476.7,176.7L475.4,172.4L473.8,168.7L475.6,164.1Z"/>
+<path d="M325.9,374.2L327,370.2L328.4,365.4L333.2,364.5L338.4,366.2L339.1,373.6L343.1,373.6L345.8,378.6L349.2,380.1L348.3,385.8L345.3,391.3L340,391.3L339.9,385.3L336.6,382.6L333.3,380.1L325.9,374.2Z"/>
+<path d="M641.1,217.5L641.7,213.3L642.7,217.9Z"/>
+<path d="M563.1,140.4L567.8,140.1L572.1,140L575.6,140.6L578.1,144L578.4,148.4L582.2,149L579.3,154.3L575.7,152.7L571,154.4L566.9,154.2L562.9,152.6L559.7,149.4L556.2,146.2L560.1,143.4L563.1,140.4Z"/>
+<path d="M899,130.8L901.8,136.7L897.7,135.6L896,140.5L898.7,143.9L894.7,146.8L894.5,140.7L894.8,134.6L894.9,130.2L893.6,122.3L896.3,118.8L897.9,124.2L899,130.8Z M563.1,118.9L558,119L554.6,118.6L559.1,116L563.2,117.1Z M13.8,78.1L22.6,77L28.1,80.1L20.7,81.9L19.6,85.8L14.9,84.6L11.2,83.6L7.7,81.6L3,80.9L0,83.4L0,70.1L6.8,72.7L14.1,76Z M1000,63.9L996.5,63L1000,61.6Z M3.6,63.7L0,63.9L6.7,62.4Z M898.9,56L894.7,56L889,55.6L894.6,53.8L898.6,55.1Z M918.7,49.7L911,50.7L905.9,49.4L911.7,48.8L918.7,49.7Z M903,48.1L890.6,50.5L886,51.3L880.5,49.1L885.6,46.2L893,46.4L903,48.1Z M659.8,64.3L649.1,64.1L643.3,61.8L645.7,57.4L651.2,54.6L655.3,51.2L660.7,48L669.9,45.8L679.2,45.2L683.9,44L689.3,43.5L679.5,47.5L671.1,49.1L662.4,52.3L658.3,55.6L653.9,58.8L659.8,64.3Z M797.1,43.4L808.5,44.3L814.8,45.9L813.3,49.9L806,51.7L811.4,54L815.4,55.5L821,54.2L829.9,54.7L842.2,56.8L848.3,54.8L852.7,54.8L857.2,56.5L860.3,62.7L864.7,64L867.4,60.5L871.8,62L876.6,61.1L881.9,62.2L888.5,61.7L890.2,57.2L915.3,59.3L924.9,63.9L936.1,63.2L941.7,63.8L943.6,67.6L947.1,68.5L950.8,67.9L955.7,67.8L960.9,68.4L966.2,68.1L971,71L974.5,70L982.3,67.3L988.1,67.1L996.1,68.7L1000,70.1L1000,83.4L996.4,84.9L992.8,84.6L997,89.2L992.7,91.6L984.9,94.1L978.2,96.8L974.2,98.9L969.2,98.1L961.9,100.7L958,100.9L954.3,100.4L950,105.9L953.3,107.9L952.9,112.8L949.2,115.7L945.5,118.9L940.4,123.5L935.5,130L933.3,122.8L931.8,115.4L933.1,110.8L935.6,107.2L939.9,106.5L944.9,102.3L949.6,98.9L954.6,96.2L956.9,91.5L951.8,94.5L944.8,98.2L942.5,94.1L935.3,95.2L928.4,100.8L924.5,103.7L920.2,104.1L916.1,101.1L912.6,102.8L904.1,102.2L895,103.2L886,109.7L875.4,117.6L879.7,118L883.8,120.8L888.6,119.4L892.6,123L890.5,129.2L889.1,138.5L884.9,143.3L880.2,149.5L876.4,153.4L870.9,157.3L867.4,155.7L863.7,158.2L864.7,153L866.3,148.9L869.7,149.5L872.5,142.6L875.1,138.4L870.5,139.4L863.9,140.7L859.4,135.2L854.6,134.1L852.6,128.8L849.9,124L843.3,121.8L839.6,121.9L836.1,122.5L835.4,126.8L831.3,131.4L827.4,135L824.1,133.7L819.3,132.9L813.6,134.9L809.9,135.4L803.9,135.7L799.6,134L794.1,132L790.6,132.4L784,131.6L780.2,128.3L774.6,126.5L771.7,130L770.2,134.2L766.2,133.4L761.5,131.7L756.2,130.7L752,132.2L746.7,135.1L742.7,136L737.6,134.4L734.5,132.3L731.6,129.8L727.6,130.6L723.8,128.7L716.1,122L712.6,119.4L706.6,121.5L700.6,118.7L696.8,116.1L691.9,115.4L682.4,118L670.7,120L668.7,124.3L671.1,129.1L666.5,130.5L662.1,129.8L657.7,129.9L651.5,129.9L645.4,127.6L641,127.7L635.3,131.3L629.9,135.5L631.4,140.9L635.3,143.1L635.1,147.3L629.7,151.3L632.2,154.5L635,160.6L631.6,162.6L627.2,159.7L623.7,157.6L617.8,155.9L613.7,155.4L607.4,152.4L601.9,149.2L606.2,145.9L608.7,142.5L610.8,139.2L611.3,134.7L607.2,133.6L603.9,132.1L598.2,131.4L595.1,129.1L590.9,125.9L587.6,124.2L590.8,122.2L587.2,119.5L585.8,114.8L581.6,114.4L578.3,112.8L575.8,108.4L576.2,104.3L580.9,99.9L583.9,94.1L587.5,90.4L583.4,88.2L582.1,83.5L580.7,76.9L579,72.1L581.7,69.5L586.4,68.1L593.8,69L601.4,69.8L611.9,73.6L614.2,77.4L611.2,79.1L606.6,80L594.2,77.5L596.7,80.3L597.1,85.3L600.6,86.3L603.3,82.9L610,84.9L616.9,78.4L622.1,79.8L621.4,75.5L620.7,71.4L628.5,72.5L626.6,76.6L633,77.1L639.5,73.3L649.2,70.5L652,73L659.2,71.8L663.3,70.4L666.5,72.4L669.7,70.2L676.4,68.2L680.2,69.2L690.3,73L689.3,68.8L685.3,64.3L690.4,60.2L694.3,56.5L701.6,57.4L699.6,62L702.2,65.4L701.6,69.9L704.6,72L698,78.9L702.3,78.2L706.1,75.7L708.2,70L704.4,67.9L706.7,64.6L703.1,61.8L708,59.6L712.1,62.8L715.5,59.1L721.3,58.9L726.4,60.8L723.6,54.5L728.5,53.8L735.2,54L741.2,53.5L742.1,49.6L750.7,47.9L758.1,47.4L766.3,46.2L774.8,45.2L779.9,45.2L783.3,42.4L789.9,41L794.6,42.1L790.8,42.9L797.1,43.4Z M791.9,39L776.2,40.3L781.3,35.9L785.7,35.7L792.7,37.6Z M642,31.5L638.3,31.9L632.2,33.3L624.6,31.4L630,30.8L634.2,30.7L639,30.3L643.1,31Z M777.6,37.1L771.5,37.5L763.8,36.5L759.2,35.2L753.3,32.2L760.5,29.9L766.5,29.2L771.9,30.8L778.3,34.1Z"/>
+<path d="M584.5,303.8L584.6,308L580.6,309.5L581.4,305.4L584.5,303.8Z"/>
+<path d="M475.6,209.6L475.9,213.7L466.8,213.6L466.8,222.1L463.6,224.1L464.1,228.9L453.2,228.9L459,228.3L461.4,221L465.3,217.4L466.6,213.2L470.7,210L475.6,209.6Z"/>
+<path d="M618.8,245.5L617.4,241.8L614.5,237.8L611.8,232.8L608.7,229L608.5,224.7L606.9,221L603.2,217.1L600.7,211.4L597.6,206.5L597.1,202.1L601.4,201.6L604.6,198.9L602.8,195L608.3,193.3L612.2,193.7L616.4,196L624.2,202.7L629.4,203L632.5,204.9L635.6,207.7L639.3,211L640.4,215.6L643.3,219.2L644.4,223.3L652.8,225L652.8,233.3L644.4,236.7L636.4,237.9L631.9,242.9L626.1,242.2L622.4,242L618.8,245.5Z"/>
+<path d="M594.3,268.5L592.2,264.3L592.2,259.4L590,263.1L587.1,267.3L583.3,265.7L580.5,268.7L575.3,267.9L572.1,266.2L568.2,270.3L565.4,267.7L563.5,262.9L561.9,257.8L562.5,253L564,247.7L566.2,234.7L569.4,233.3L569.4,226.7L580.6,226.7L591.4,226.7L602.4,226.7L603.1,234L604.1,238L605.3,241.9L602.1,245.7L600.9,250.6L600.8,254.8L597.9,259.7L596.5,263.6L594.3,268.1Z"/>
+<path d="M594.3,268.5L592.5,272.2L594.7,275.9L598.1,281.6L594.5,285.8L590.8,287.4L586.8,287.4L583.2,286.1L579.7,285.1L576,282.6L572.8,278.2L569.8,275L566.4,271.3L568.9,267.3L573.5,268.2L577.3,268L582,267.4L585.7,267.6L588.5,264.9L589.8,261.1L592.2,264.3L594,268.4Z"/>
+<path d="M453.6,254.7L451,250.9L453.6,247.9L456.6,245.4L460.8,245.7L464.4,249L466.3,253.4L468.1,257.5L463.3,258.1L456.8,257.9L453.2,256.2L456.9,255.7L460.3,255.7L457.2,253.8L453.6,254.7Z"/>
+<path d="M946.8,332.9L943.4,332.1L946.8,332.9Z M949.1,332L946.1,327.7L949.1,332Z M944.1,327.8L940.5,325.8L944.1,327.8Z M937.6,324.5L934.8,322L937.6,324.5Z"/>
+<path d="M468.2,277.4L464,274L464.7,268.9L469.1,266.5L470.8,270.9L469,275.3Z"/>
+<path d="M256.1,255.4L252.1,255.1L255.4,253.5Z"/>
+<path d="M635.9,268.5L632.7,273.3L621.3,269.4L618.2,264.8L622.5,265.2L626.5,264.3L632,262.9L636,262L635.9,266.8Z"/>
+<path d="M638.1,261.4L642,259.9L641.8,264.5L640.4,269.3L637.4,277.3L635,282.2L632.6,285.9L629.3,290.5L626.6,293.2L622.4,296.5L616.8,303.1L613.8,290.7L616.3,286.9L621.3,283.5L624.9,283.3L632.7,273.3L635.9,268.5L635.9,263.4Z"/>
+<path d="M558,148.6L561.5,151.7L563.9,156L560.9,159L558.2,156.2L554.5,156L553.1,151.9L552.3,147L556.2,146.2Z"/>
+<path d="M341.3,280.1L344.9,280.2L350.1,280.8L348.9,286L349.3,290.9L345.6,291.9L341.2,290.8L338.8,286.5L340.8,283.1Z"/>
+<path d="M552.4,135L556.7,135.2L562.7,136.4L557.8,137.9L553.3,139.6L549.6,140.8L547.1,138L550.3,136.5Z"/>
+<path d="M538.4,145L542,144.5L545.5,143.9L543.5,147.2L540,148.4Z"/>
+<path d="M561.6,80.9L559.4,85.3L554.9,88L549.6,90.8L547.6,95.5L552.2,99.7L549.6,103.5L545.7,109.9L540.7,112.7L536,115.5L532.7,108.5L530.6,103.8L534.2,99.6L533.3,94L533.1,89.6L537.7,86.5L542,79.4L544.7,75.7L549.2,73.3L555.2,72L561.1,71.3L565.4,73.5L565.5,78.7L561.6,80.9Z M547.4,108.7L545.6,112.7L547.4,108.7Z M553.8,106.8L550.9,110.2L552.9,106.9Z"/>
+<path d="M589.1,389.1L585.2,389.1L587,385.5L589.1,389.1Z"/>
+<path d="M607.8,188.7L602.3,192.3L599.5,189.1L601.2,184.7L600.4,180.6L606,177L609.8,177.6L614.5,176.4L615,181.2L613.9,185.3L607.8,188.7Z"/>
+<path d="M540.3,257.1L538.8,253.3L538.8,247.7L542.4,244.6L542.5,240.2L543.6,233.5L541.9,229L541.3,223.8L555.1,228.3L566.2,234.7L566.4,248L562.7,250.2L561.9,255.4L562.5,261.1L560.3,264.8L558.3,268.4L553,269.8L549.9,273.7L546.4,275L542.4,275.3L541.6,270.7L538.8,268.2L543,266.7L541.6,261.5L540.3,257.1Z"/>
+<path d="M505.2,279.5L501.6,277L502,272.3L501,266L504.1,268.9L504.5,277.2Z"/>
+<path d="M785,259.4L780.1,257.9L776.3,263.8L775.6,269.2L778.6,272.3L780.6,277.1L783.7,279.3L778.5,277.9L775,273.6L772.9,270.1L775.1,263.5L775.5,257.3L773.4,251.3L774.7,246.1L771.8,241.4L772.9,234.3L776.5,232.7L779.5,235L780.7,241.6L784.5,240.2L788.8,239.2L791.1,245.2L793.2,250.9L789.7,251.9L786.1,252.6L785,259.4Z"/>
+<path d="M697.3,165.9L693.2,166.3L699.4,169.1L704.7,168.6L708,172.1L705.4,175.3L701.8,176.5L698.7,173.6L695.2,174.2L691.3,175.5L689.4,170.3L691.7,166.4L696.3,163.5Z"/>
+<path d="M670,181.2L664.5,175.3L659.3,173.2L654.2,173.5L649.8,176L649.7,170.2L646.4,166.6L649.6,164.6L649.2,159.6L646.7,162.9L650.2,158.9L654,162.5L658.6,162.3L662.9,157.5L666.6,159.3L671,162.4L673.3,166.5L676.4,168.8L681.2,172L684.9,173.4L679.9,176.3L677.7,180L672.9,182.4Z"/>
+<path d="M847.1,329.6L851.8,328L847.5,331.3Z"/>
+<path d="M526.3,199L525.2,193L521.1,188.9L522.6,184.5L522.8,178.6L526.4,175.5L530.6,176.4L530.4,181L528.2,185.6L530.9,189L529.5,194.1L527.7,198.2Z"/>
+<path d="M602.5,162.2L606.5,163.5L612.1,163.3L615.4,161.5L621.1,163L623.3,166.7L623.4,172.4L623,176.7L618.8,175.4L614.5,176.4L609.8,177.6L606,177L602.1,177.3L596.4,177.3L590.3,179.6L585.1,177.7L579.8,177.7L575.1,174.5L574.5,170L575.8,165.3L580.1,165.1L586.5,163L589.9,160.9L597.7,159.9L602.5,162.2Z M575.5,164.4L572.5,160.6L577.8,160L580,163.2L575.5,164.4Z"/>
+<path d="M838.3,218.7L836.6,224L833.6,221.5L837.5,215.7Z"/>
+<path d="M594.2,303.2L604.7,310.3L608.9,315.6L607.6,319.7L609.6,323.7L608.9,328.3L611,333.7L606.7,337.6L602.2,338.6L598.1,338.1L595.2,333.9L591,330.8L587.7,329.2L583.9,323.6L581.7,319.8L581.5,315L584.7,311.9L585.4,307.6L585.5,303.4L594.2,303.2Z"/>
+<path d="M588.5,303.4L584.5,303.8L583,298L585.7,293.8L585.6,288.3L590.8,287.4L594.5,285.8L596.1,289.8L597.3,293.6L594.9,298.3L594.2,303.2L588.5,303.4Z"/>
+<path d="M588.3,126.3L593.8,125.5L597.3,129.3L601.7,132.6L605.6,133.6L611.3,134.7L610.8,139.2L606.3,141.5L602.1,144.3L597.1,145.8L601.5,148.4L597.9,150.2L594.1,152.1L590.2,148.9L593.3,147.2L588.2,145.6L584.4,146.6L581,148.5L583.4,145.3L580.7,141.6L576.5,138.4L572.8,139.3L569.1,140.9L564.3,139.7L562.6,135.1L565.1,132.3L565.4,128.1L570.4,127L576.3,128L580.5,128L584.9,128.9L588.3,126.3Z"/>
+<path d="M339.9,400.7L344.5,402.9L348.4,405L352.2,409.1L350.5,414.7L347.4,416.5L343.8,416.2L339.4,414.9L337.9,410.9L338.5,406.8L339.9,400.7Z"/>
+<path d="M67.9,236.4L67.1,232.4L70,235Z M236.6,135.4L239.9,138L245.4,139.5L251.1,140L254.5,139L259.8,141.5L264.2,143.7L267,146.3L270.7,148.8L271.8,154.8L269.7,158.6L274.2,159.3L280.7,157.1L284.1,154.6L287.5,153.3L290.8,150.6L296.3,150L301.4,150L304.7,147L307.7,141.8L311.7,143.1L311.7,147.7L311,152.2L305.2,154.4L303.3,158.9L300.4,162.3L295.3,163.6L299.3,162.9L294.5,164.6L291.9,170.2L289.1,175.9L287.9,169.5L288.1,173.6L289.3,178.2L287.9,184L283.2,186.9L280,189.5L276.9,191.6L274.1,195.2L274.1,199.9L276.3,205.1L277.6,210.4L276.7,216L273,213.8L270.3,208.3L269.6,203L266.4,199.7L263.1,201L260,198.7L254.4,198.7L251.6,201.7L247.6,202.8L243.1,201.5L239.3,201L234.4,204.2L230.2,207.2L229.6,212.6L224.9,212.1L223.6,208.2L221,204.3L217.6,200.7L213.6,203.4L209.8,201.4L206.6,196.4L199.3,194.2L191.6,195.6L185.3,193.2L181.1,191.6L174.6,191.5L172.4,187.9L169.2,186.4L165.6,185.2L161.9,179.5L159.6,174.8L156.3,170.2L154.4,165.6L155,160L155.2,154.3L155.8,148.3L155.3,143.8L153.6,139.4L158,139.9L166.7,136.7L174.9,136.7L186.1,136.7L194.3,136.7L202.6,136.7L211,136.7L220.4,136.7L229.9,136.7L235.7,136.7Z M75,109.6L70.8,110L74.4,106.8Z M40.1,100.3L36.5,100.2L39.8,99Z M23,87.4L26.4,87.7L31.4,89L27,89.4L23.5,88.9Z M69.3,62.8L77.2,63.9L81.3,65.2L90,66L95.3,66.3L101.1,66.2L105.4,67.2L108.4,80L108.3,99L113.8,100L118.2,103.7L123.7,100.7L127,103.8L131.3,107.7L134.1,111.5L138.9,113.6L137.4,117.3L133.4,115L129.1,109.4L124.9,106L120.5,106L111.5,101.5L104,99.7L100.1,100L94.7,98.5L91.3,97.1L88.8,100.1L84.1,101L78.6,102.8L79.4,97.6L76.2,99.8L72.2,102.2L68.6,107.6L65.1,110.1L60.8,111.8L56.7,114.8L52.2,115.5L47,117.7L42.3,118.7L47.6,115.5L54,113.3L59.2,109.9L62.4,105.6L58.2,105.3L54.6,103.1L50.1,104.4L48.6,100L44.9,100.7L40.7,98.3L38.6,95L41.9,91.2L45.1,89.3L49.3,88.2L53.4,87.4L48.7,84.8L41.8,85.2L37.7,84.4L33,81.1L36.9,79.7L43.1,78.1L50.9,79.6L45.2,76.3L40.6,73.2L36.8,72.1L43.2,70.3L46.8,68.8L50.3,65.6L58.2,63.7L65.1,62.1L69.3,62.8Z"/>
+<path d="M684.8,175.5L681.2,172L676.4,168.8L673.3,166.5L671,162.4L666.9,161.9L662.9,157.5L658.1,160.6L655.4,150L662.5,148L667.3,150.7L672.3,155L680.3,154.2L683.6,156.7L685.3,162.8L688.8,162.9L695.5,159.7L699.6,162L702.9,163.8L699.4,166.2L695.7,165L691.7,166.4L688.1,168.1L690,172.8L686.3,175.5Z"/>
+<path d="M301.9,260.7L301,265.2L300.8,269.8L301.7,263.4L305.1,262.1L308.7,261.9L313.1,264.8L317.6,266L321.3,265.4L324.8,264.3L328.9,267.1L331.5,271.4L332.5,276.5L329.4,280.1L331.7,283.6L327.5,286.1L322.5,286.6L321.5,291.7L318.5,296.3L314.2,295.8L312.6,291.3L312.2,287.2L311.8,282.6L308.4,279.3L305.3,276.8L300.1,276.7L298.8,272L297.1,267.5L299.4,263Z"/>
+<path d="M800.1,228.2L796.4,231L794.1,234.2L795.6,240L798.2,244.3L802.4,249.1L803.7,255.2L803.3,261.1L797.8,265.5L792.1,271.3L791.9,266.9L795.1,263.5L798.6,258.9L798.3,252.7L798.1,247L794.2,241.7L791.9,237.8L788.6,235.8L790.1,230.8L786.7,230.8L783.8,225.1L787.5,224.3L792.6,222.2L796.5,224L800.1,228.2Z"/>
+<path d="M647.5,244.5L644.9,248L637.7,251L634,253.5L629.8,255.3L626.1,256.6L622.7,258L620.1,254.1L618.3,249.3L620.1,244.4L625.6,241.9L629.9,242.4L633.8,239.4L644.4,236.7L646.6,242.2Z"/>
+<path d="M587.6,397.5L585.1,401.4L580.3,407.2L576.3,410.8L572,412.2L568.5,413.3L563.9,413.1L559.8,414.2L555.8,416L552.4,414.8L550.7,410.9L550.6,405.5L547.4,399.6L545.4,395.3L549.5,396.2L555.3,394.9L555.3,382.6L557.7,386.2L561.4,387.6L564.8,384.2L569.5,385.7L572.1,382.3L575.3,378.6L581.8,373.6L585.2,373.8L588,378.9L588.2,384.9L585.2,388L588.5,390.6L590.2,394.3L587.6,397.5Z M580.5,396.5L576.5,397.5L577.1,402.2L580.1,400.2Z"/>
+<path d="M591,330.8L593,335.1L592.5,341.5L590.8,345.7L583.8,349.3L580.4,353.5L576.7,357.6L573.3,359.5L569.7,358.9L564.5,358.4L560.8,353.6L560.9,343L566.7,343L566.7,337.5L570.6,337.8L573.8,339.7L578.2,340.9L580.4,344.2L582.3,340.6L578.8,339.3L579.6,332L580.6,328L584.3,327.5L587.7,329.2L591,330.8Z"/>
+<path d="M586.6,374.2L582.9,373.7L577.8,371.6L575.8,368L572.7,364.3L570.2,359.1L574.2,359.9L579.1,354.9L582,352.1L586.6,352.9L589.8,354.6L591.2,359.9L590.6,364.7L589.6,370.4L586.6,374.2Z"/>
+</g>
+
+      <!-- Equator line -->
+      <line x1="0" y1="310" x2="1000" y2="310" stroke="rgba(0,255,136,0.08)" stroke-width="0.5" stroke-dasharray="6,8"/>
+      <text x="8" y="308" fill="rgba(0,255,136,0.2)" font-family="Share Tech Mono" font-size="7">EQ</text>
+      <!-- Tropic lines -->
+      <line x1="0" y1="250" x2="1000" y2="250" stroke="rgba(0,255,136,0.04)" stroke-width="0.5" stroke-dasharray="3,10"/>
+      <line x1="0" y1="370" x2="1000" y2="370" stroke="rgba(0,255,136,0.04)" stroke-width="0.5" stroke-dasharray="3,10"/>
+      <!-- Longitude lines -->
+      <line x1="250" y1="0" x2="250" y2="600" stroke="rgba(0,255,136,0.04)" stroke-width="0.4" stroke-dasharray="4,12"/>
+      <line x1="500" y1="0" x2="500" y2="600" stroke="rgba(0,255,136,0.04)" stroke-width="0.4" stroke-dasharray="4,12"/>
+      <line x1="750" y1="0" x2="750" y2="600" stroke="rgba(0,255,136,0.04)" stroke-width="0.4" stroke-dasharray="4,12"/>
+
+      <g id="country-labels" font-family="Orbitron, monospace" text-anchor="middle" style="pointer-events:none">
+        <!-- NORTH AMERICA -->
+        <text x="229" y="172" font-size="8" font-weight="700" fill="rgba(0,255,136,0.22)" letter-spacing="0.15em">UNITED STATES</text>
+        <text x="232" y="113" font-size="7" font-weight="700" fill="rgba(0,255,136,0.2)" letter-spacing="0.1em">CANADA</text>
+        <text x="130" y="130" font-size="5" fill="rgba(0,255,136,0.15)">ALASKA</text>
+        <text x="215" y="222" font-size="6" font-weight="700" fill="rgba(0,255,136,0.2)">MEXICO</text>
+        <text x="270" y="263" font-size="4.5" fill="rgba(0,255,136,0.14)">CUBA</text>
+        <text x="255" y="244" font-size="4.5" fill="rgba(0,255,136,0.14)">GUATEMALA</text>
+        <text x="280" y="254" font-size="4.5" fill="rgba(0,255,136,0.14)">HAITI</text>
+        <!-- SOUTH AMERICA -->
+        <text x="316" y="280" font-size="5" fill="rgba(0,255,136,0.16)">VENEZUELA</text>
+        <text x="294" y="300" font-size="5" fill="rgba(0,255,136,0.16)">COLOMBIA</text>
+        <text x="282" y="318" font-size="4.5" fill="rgba(0,255,136,0.14)">ECUADOR</text>
+        <text x="288" y="340" font-size="5" fill="rgba(0,255,136,0.16)">PERU</text>
+        <text x="319" y="358" font-size="5" fill="rgba(0,255,136,0.16)">BOLIVIA</text>
+        <text x="340" y="333" font-size="7" font-weight="700" fill="rgba(0,255,136,0.22)" letter-spacing="0.12em">BRAZIL</text>
+        <text x="338" y="380" font-size="4.5" fill="rgba(0,255,136,0.14)">PARAGUAY</text>
+        <text x="344" y="408" font-size="4.5" fill="rgba(0,255,136,0.14)">URUGUAY</text>
+        <text x="321" y="415" font-size="6" font-weight="700" fill="rgba(0,255,136,0.18)">ARGENTINA</text>
+        <text x="302" y="450" font-size="5" fill="rgba(0,255,136,0.16)">CHILE</text>
+        <!-- EUROPE -->
+        <text x="494" y="126" font-size="5" font-weight="700" fill="rgba(0,255,136,0.22)">UK</text>
+        <text x="517" y="136" font-size="4.5" fill="rgba(0,255,136,0.14)">NETH</text>
+        <text x="512" y="142" font-size="4.5" fill="rgba(0,255,136,0.14)">BELGIUM</text>
+        <text x="506" y="152" font-size="5" font-weight="700" fill="rgba(0,255,136,0.2)">FRANCE</text>
+        <text x="489" y="168" font-size="5" font-weight="700" fill="rgba(0,255,136,0.2)">SPAIN</text>
+        <text x="478" y="172" font-size="4.5" fill="rgba(0,255,136,0.14)">PORTUGAL</text>
+        <text x="528" y="133" font-size="5" font-weight="700" fill="rgba(0,255,136,0.2)">GERMANY</text>
+        <text x="539" y="143" font-size="4.5" fill="rgba(0,255,136,0.14)">AUSTRIA</text>
+        <text x="522" y="148" font-size="4.5" fill="rgba(0,255,136,0.14)">SWITZ</text>
+        <text x="533" y="160" font-size="5" font-weight="700" fill="rgba(0,255,136,0.2)">ITALY</text>
+        <text x="542" y="136" font-size="4.5" fill="rgba(0,255,136,0.14)">CZECH</text>
+        <text x="556" y="130" font-size="5" fill="rgba(0,255,136,0.18)">POLAND</text>
+        <text x="570" y="150" font-size="4.5" fill="rgba(0,255,136,0.14)">ROMANIA</text>
+        <text x="589" y="140" font-size="5" fill="rgba(0,255,136,0.18)">UKRAINE</text>
+        <text x="561" y="168" font-size="4.5" fill="rgba(0,255,136,0.14)">GREECE</text>
+        <text x="550" y="95" font-size="4.5" fill="rgba(0,255,136,0.14)">NORWAY</text>
+        <text x="562" y="90" font-size="4.5" fill="rgba(0,255,136,0.14)">SWEDEN</text>
+        <text x="573" y="87" font-size="4.5" fill="rgba(0,255,136,0.14)">FINLAND</text>
+        <text x="528" y="116" font-size="4.5" fill="rgba(0,255,136,0.14)">DENMARK</text>
+        <!-- RUSSIA -->
+        <text x="700" y="100" font-size="9" font-weight="700" fill="rgba(0,255,136,0.2)" letter-spacing="0.25em">RUSSIA</text>
+        <!-- MIDDLE EAST -->
+        <text x="598" y="172" font-size="5" font-weight="700" fill="rgba(0,255,136,0.2)">TURKEY</text>
+        <text x="623" y="192" font-size="4.5" fill="rgba(0,255,136,0.14)">IRAQ</text>
+        <text x="612" y="198" font-size="4.5" fill="rgba(0,255,136,0.14)">SYRIA</text>
+        <text x="596" y="196" font-size="4.5" fill="rgba(0,255,136,0.14)">ISRAEL</text>
+        <text x="648" y="195" font-size="5" font-weight="700" fill="rgba(0,255,136,0.2)">IRAN</text>
+        <text x="626" y="218" font-size="5" fill="rgba(0,255,136,0.18)">SAUDI ARABIA</text>
+        <text x="665" y="209" font-size="4.5" fill="rgba(0,255,136,0.14)">AFGHAN</text>
+        <text x="693" y="200" font-size="4.5" fill="rgba(0,255,136,0.14)">PAKISTAN</text>
+        <text x="640" y="240" font-size="4.5" fill="rgba(0,255,136,0.14)">YEMEN</text>
+        <text x="652" y="228" font-size="4.5" fill="rgba(0,255,136,0.14)">OMAN</text>
+        <text x="638" y="208" font-size="4.5" fill="rgba(0,255,136,0.14)">KUWAIT</text>
+        <text x="654" y="216" font-size="4.5" fill="rgba(0,255,136,0.14)">UAE</text>
+        <!-- AFRICA -->
+        <text x="486" y="198" font-size="5" fill="rgba(0,255,136,0.18)">MOROCCO</text>
+        <text x="508" y="210" font-size="5" fill="rgba(0,255,136,0.18)">ALGERIA</text>
+        <text x="547" y="214" font-size="5" fill="rgba(0,255,136,0.18)">LIBYA</text>
+        <text x="584" y="210" font-size="5" font-weight="700" fill="rgba(0,255,136,0.2)">EGYPT</text>
+        <text x="525" y="237" font-size="4.5" fill="rgba(0,255,136,0.14)">MALI</text>
+        <text x="504" y="235" font-size="4.5" fill="rgba(0,255,136,0.14)">MAURITANIA</text>
+        <text x="508" y="250" font-size="4.5" fill="rgba(0,255,136,0.14)">SENEGAL</text>
+        <text x="515" y="262" font-size="4.5" fill="rgba(0,255,136,0.14)">GUINEA</text>
+        <text x="550" y="245" font-size="4.5" fill="rgba(0,255,136,0.14)">NIGER</text>
+        <text x="538" y="260" font-size="5" fill="rgba(0,255,136,0.18)">NIGERIA</text>
+        <text x="555" y="270" font-size="4.5" fill="rgba(0,255,136,0.14)">CAMEROON</text>
+        <text x="592" y="250" font-size="4.5" fill="rgba(0,255,136,0.14)">SUDAN</text>
+        <text x="600" y="268" font-size="5" fill="rgba(0,255,136,0.18)">ETHIOPIA</text>
+        <text x="616" y="284" font-size="4.5" fill="rgba(0,255,136,0.14)">SOMALIA</text>
+        <text x="567" y="307" font-size="5" fill="rgba(0,255,136,0.18)">DR CONGO</text>
+        <text x="603" y="302" font-size="5" font-weight="700" fill="rgba(0,255,136,0.2)">KENYA</text>
+        <text x="598" y="322" font-size="4.5" fill="rgba(0,255,136,0.14)">TANZANIA</text>
+        <text x="550" y="340" font-size="4.5" fill="rgba(0,255,136,0.14)">ANGOLA</text>
+        <text x="580" y="347" font-size="4.5" fill="rgba(0,255,136,0.14)">ZAMBIA</text>
+        <text x="598" y="360" font-size="4.5" fill="rgba(0,255,136,0.14)">MOZAMBIQUE</text>
+        <text x="632" y="365" font-size="4.5" fill="rgba(0,255,136,0.14)">MADAGASCAR</text>
+        <text x="567" y="395" font-size="5" font-weight="700" fill="rgba(0,255,136,0.2)">SOUTH AFRICA</text>
+        <text x="575" y="365" font-size="4.5" fill="rgba(0,255,136,0.14)">ZIMBABWE</text>
+        <!-- CENTRAL/SOUTH ASIA -->
+        <text x="720" y="228" font-size="7" font-weight="700" fill="rgba(0,255,136,0.22)" letter-spacing="0.1em">INDIA</text>
+        <text x="751" y="220" font-size="4.5" fill="rgba(0,255,136,0.14)">BANGLADESH</text>
+        <text x="734" y="208" font-size="4.5" fill="rgba(0,255,136,0.14)">NEPAL</text>
+        <text x="726" y="276" font-size="4.5" fill="rgba(0,255,136,0.14)">SRI LANKA</text>
+        <text x="768" y="237" font-size="4.5" fill="rgba(0,255,136,0.14)">MYANMAR</text>
+        <text x="782" y="252" font-size="5" fill="rgba(0,255,136,0.18)">THAILAND</text>
+        <text x="801" y="248" font-size="4.5" fill="rgba(0,255,136,0.14)">VIETNAM</text>
+        <text x="785" y="270" font-size="4.5" fill="rgba(0,255,136,0.14)">CAMBODIA</text>
+        <text x="786" y="290" font-size="4.5" fill="rgba(0,255,136,0.14)">MALAYSIA</text>
+        <text x="835" y="315" font-size="5" font-weight="700" fill="rgba(0,255,136,0.2)">INDONESIA</text>
+        <text x="840" y="258" font-size="5" fill="rgba(0,255,136,0.18)">PHILIPPINES</text>
+        <!-- EAST ASIA -->
+        <text x="690" y="142" font-size="5" fill="rgba(0,255,136,0.16)">KAZAKHSTAN</text>
+        <text x="799" y="142" font-size="5" fill="rgba(0,255,136,0.16)">MONGOLIA</text>
+        <text x="793" y="185" font-size="7" font-weight="700" fill="rgba(0,255,136,0.22)" letter-spacing="0.1em">CHINA</text>
+        <text x="854" y="180" font-size="5" font-weight="700" fill="rgba(0,255,136,0.2)">S. KOREA</text>
+        <text x="854" y="170" font-size="4.5" fill="rgba(0,255,136,0.14)">N. KOREA</text>
+        <text x="890" y="179" font-size="5" font-weight="700" fill="rgba(0,255,136,0.22)">JAPAN</text>
+        <text x="813" y="208" font-size="4.5" fill="rgba(0,255,136,0.14)">TAIWAN</text>
+        <!-- OCEANIA -->
+        <text x="874" y="385" font-size="7" font-weight="700" fill="rgba(0,255,136,0.22)" letter-spacing="0.15em">AUSTRALIA</text>
+        <text x="986" y="435" font-size="5" font-weight="700" fill="rgba(0,255,136,0.2)">NEW ZEALAND</text>
+        <text x="940" y="295" font-size="4.5" fill="rgba(0,255,136,0.14)">PAPUA NEW GUINEA</text>
+        <!-- OCEANS -->
+        <text x="100" y="340" font-size="7" fill="rgba(0,255,136,0.1)" font-weight="700" letter-spacing="0.2em">PACIFIC</text>
+        <text x="100" y="350" font-size="5" fill="rgba(0,255,136,0.08)" letter-spacing="0.15em">OCEAN</text>
+        <text x="400" y="330" font-size="7" fill="rgba(0,255,136,0.1)" font-weight="700" letter-spacing="0.2em">ATLANTIC</text>
+        <text x="400" y="340" font-size="5" fill="rgba(0,255,136,0.08)" letter-spacing="0.15em">OCEAN</text>
+        <text x="700" y="310" font-size="7" fill="rgba(0,255,136,0.1)" font-weight="700" letter-spacing="0.2em">INDIAN</text>
+        <text x="700" y="320" font-size="5" fill="rgba(0,255,136,0.08)" letter-spacing="0.15em">OCEAN</text>
+        <text x="960" y="295" font-size="6" fill="rgba(0,255,136,0.08)" font-weight="700" letter-spacing="0.15em">PACIFIC</text>
+        <text x="960" y="305" font-size="4" fill="rgba(0,255,136,0.06)" letter-spacing="0.15em">OCEAN</text>
+        <text x="400" y="510" font-size="5" fill="rgba(0,255,136,0.06)" letter-spacing="0.2em">SOUTHERN OCEAN</text>
+        <text x="200" y="60" font-size="5" fill="rgba(0,255,136,0.06)" letter-spacing="0.2em">ARCTIC OCEAN</text>
+      </g>
+
+      <g id="alert-circles-layer"></g>
+      <g id="sightings-layer"></g>
+    </svg>
+    <div id="zoom-controls">
+      <button class="zoom-btn" onclick="zoomMap(1.3)" title="Zoom In">+</button>
+      <button class="zoom-btn" onclick="zoomMap(0.77)" title="Zoom Out">−</button>
+      <button class="zoom-btn" onclick="resetZoom()" title="Reset" style="font-size:0.55rem">⟲</button>
+    </div>
+    <div id="watermark">MAKE ALIENS GREAT AGAIN · GLOBAL ALIEN SCANNER v2.0</div>
+  </div>
+
+  <!-- RIGHT: ANALYTICS -->
+  <div id="right-panel">
+    <div class="panel-title">📊 ANALYTICS</div>
+    <div class="stat-block">
+      <div class="sb-label">REPORTS THIS WEEK</div>
+      <div class="sb-value" id="r-week">847</div>
+      <div class="sb-sub" id="r-week-change">↑ 23% vs last week</div>
+    </div>
+    <div class="stat-block">
+      <div class="sb-label">HOTSPOT REGION</div>
+      <div class="sb-value" style="font-size:0.7rem; color: var(--amber)" id="r-hotspot">SW UNITED STATES</div>
+      <div class="sb-sub" id="r-hotspot-sub">38 sightings in 24hrs</div>
+    </div>
+    <div class="stat-block">
+      <div class="sb-label">OBJECT SHAPES REPORTED</div>
+      <div class="shape-bar" id="shape-stats"></div>
+    </div>
+    <div class="stat-block">
+      <div class="sb-label">SOURCE BREAKDOWN</div>
+      <div style="margin-top:4px">
+        <div class="shape-row">
+          <div class="sr-name" style="color:var(--blue)">NUFORC</div>
+          <div class="sr-bar-wrap"><div class="sr-bar" id="bar-nuforc" style="width:65%; background: var(--blue)"></div></div>
+          <div class="sr-count" id="cnt-nuforc">—</div>
+        </div>
+        <div class="shape-row">
+          <div class="sr-name" style="color:var(--amber)">MUFON</div>
+          <div class="sr-bar-wrap"><div class="sr-bar" id="bar-mufon" style="width:28%; background: var(--amber)"></div></div>
+          <div class="sr-count" id="cnt-mufon">—</div>
+        </div>
+        <div class="shape-row">
+          <div class="sr-name" style="color:var(--red)">AARO</div>
+          <div class="sr-bar-wrap"><div class="sr-bar" id="bar-aaro" style="width:7%; background: var(--red)"></div></div>
+          <div class="sr-count" id="cnt-aaro">—</div>
+        </div>
+      </div>
+    </div>
+    <div id="alert-box">
+      <div class="ab-title">⚠ HIGH ACTIVITY ZONES</div>
+      <div class="ab-text" id="alert-text"></div>
+    </div>
+    <div class="stat-block" style="margin-top:auto; border-top: 1px solid var(--border)">
+      <div class="sb-label">SCANNER STATUS</div>
+      <div style="font-size: 0.52rem; color: var(--green); margin-top:3px">
+        <div>● NUFORC API — CONNECTED</div>
+        <div style="margin-top:2px">● MUFON DB — CONNECTED</div>
+        <div style="margin-top:2px">● AARO PORTAL — MONITORING</div>
+        <div style="margin-top:2px; color: var(--amber)">● UFOSTALKER — SYNCING</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM TICKER -->
+<div id="bottom-bar">
+  <div id="ticker"></div>
+</div>
+
+</div>
+
+<!-- TOOLTIP -->
+<div id="tooltip">
+  <div class="tt-location" id="tt-loc"></div>
+  <div class="tt-time" id="tt-time"></div>
+  <div class="tt-desc" id="tt-desc"></div>
+  <div class="tt-source" id="tt-source"></div>
+  <a class="tt-link" id="tt-link" href="#" target="_blank">▸ VIEW SOURCE REPORT</a>
+</div>
+
+<!-- SIGHTING DETAIL MODAL -->
+<div id="sighting-modal-overlay" onclick="closeSightingModal()">
+  <div id="sighting-modal" onclick="event.stopPropagation()">
+    <div class="sm-header">
+      <span class="sm-title">▸ SIGHTING REPORT</span>
+      <button class="sm-close" onclick="closeSightingModal()">✕</button>
+    </div>
+    <div class="sm-body">
+      <div class="sm-row">
+        <div class="sm-label">LOCATION</div>
+        <div class="sm-value sm-location" id="sm-location"></div>
+      </div>
+      <div class="sm-row">
+        <div class="sm-label">TIME</div>
+        <div class="sm-value" id="sm-time"></div>
+      </div>
+      <div class="sm-row">
+        <div class="sm-label">SHAPE</div>
+        <div class="sm-value" id="sm-shape"></div>
+      </div>
+      <div class="sm-row">
+        <div class="sm-label">SOURCE</div>
+        <div class="sm-value" id="sm-source"></div>
+      </div>
+      <div class="sm-row">
+        <div class="sm-label">DETAILS</div>
+        <div class="sm-value sm-desc" id="sm-desc"></div>
+      </div>
+      <a class="sm-link" id="sm-link" href="#" target="_blank">▸ VIEW FULL SOURCE REPORT</a>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- SCANLINES -->
+<div id="scanlines"></div>
+
+<script>
+const SHAPES = ['circle', 'triangle', 'disk', 'orb', 'unknown', 'cylinder', 'chevron', 'fireball'];
+const SOURCES = ['nuforc', 'mufon', 'aaro', 'live'];
+const SOURCE_LABELS = { nuforc: 'NUFORC', mufon: 'MUFON', aaro: 'AARO', live: 'LIVE REPORT' };
+const SOURCE_URLS = {
+  nuforc: 'https://nuforc.org/webreports/ndxevent.html',
+  mufon: 'https://mufoncms.com/cgi-bin/report_handler.pl',
+  aaro: 'https://aaro.mil',
+  live: 'https://ufostalker.com'
+};
+
+function recentUTCTime(minutesAgo) {
+  const d = new Date(Date.now() - minutesAgo * 60000);
+  const hh = String(d.getUTCHours()).padStart(2,'0');
+  const mm = String(d.getUTCMinutes()).padStart(2,'0');
+  const ss = String(d.getUTCSeconds()).padStart(2,'0');
+  return hh + ':' + mm + ':' + ss + ' UTC';
+}
+
+function geoToPixel(lat, lng) {
+  const x = 2.79 * lng + 500;
+  const y = -3.29 * lat + 297.4;
+  return [Math.round(x), Math.round(y)];
+}
+function gp(lat, lng) { const p = geoToPixel(lat, lng); return { lat: p[1], lng: p[0], geoLat: lat, geoLng: lng }; }
+
+const SIGHTING_DATA = [
+  { id:1, loc:'Phoenix, AZ', ...gp(33.45, -112.07), shape:'triangle', src:'nuforc', time:recentUTCTime(3), desc:'Silent black triangle hovering for 8 minutes before accelerating northward at extreme speed. 3 witnesses.' },
+  { id:2, loc:'Roswell, NM', ...gp(33.39, -104.52), shape:'disk', src:'mufon', time:recentUTCTime(11), desc:'Classic saucer shape, metallic sheen. Rotated slowly then shot upward vertically.' },
+  { id:3, loc:'Las Vegas, NV', ...gp(36.17, -115.14), shape:'orb', src:'nuforc', time:recentUTCTime(18), desc:'Bright orange orb hovering near Nellis AFB. Disappeared without sound or motion.' },
+  { id:4, loc:'Denver, CO', ...gp(39.74, -104.98), shape:'circle', src:'mufon', time:recentUTCTime(27), desc:'White circular object tracked for 12 minutes. No navigation lights visible.' },
+  { id:5, loc:'Seattle, WA', ...gp(47.61, -122.33), shape:'triangle', src:'aaro', time:recentUTCTime(35), desc:'UAP tracked on radar. Three light points in triangle formation. Official report filed.' },
+  { id:6, loc:'London, UK', ...gp(51.51, -0.13), shape:'orb', src:'nuforc', time:recentUTCTime(42), desc:'Blue-white orb seen over Thames. Multiple witnesses including pilots at Heathrow.' },
+  { id:7, loc:'Moscow, Russia', ...gp(55.76, 37.62), shape:'cylinder', src:'mufon', time:recentUTCTime(58), desc:'Long cylindrical craft. No wings, no sound. Tracked by military radar for 4 minutes.' },
+  { id:8, loc:'Tokyo, Japan', ...gp(35.68, 139.69), shape:'disk', src:'nuforc', time:recentUTCTime(74), desc:'Silver disk hovering over Mt. Fuji. Photographed by multiple tourists. Sharp accel NE.' },
+  { id:9, loc:'Sydney, AU', ...gp(-33.87, 151.21), shape:'fireball', src:'mufon', time:recentUTCTime(89), desc:'Green fireball tracked across sky. Not consistent with meteor trajectory or speed.' },
+  { id:10, loc:'São Paulo, BR', ...gp(-23.55, -46.63), shape:'orb', src:'live', time:recentUTCTime(102), desc:'Multiple orange orbs in formation. Stationary for 20 minutes, then moved in unison.' },
+  { id:11, loc:'Cairo, Egypt', ...gp(30.04, 31.24), shape:'triangle', src:'nuforc', time:recentUTCTime(118), desc:'Triangle reported over Giza. Lights at each point. Hovered silently then vanished.' },
+  { id:12, loc:'Chicago, IL', ...gp(41.88, -87.63), shape:'circle', src:'mufon', time:recentUTCTime(135), desc:'Hovering bright white disc over Lake Michigan. FAA logged anomalous track.' },
+  { id:13, loc:'Toronto, CA', ...gp(43.65, -79.38), shape:'orb', src:'nuforc', time:recentUTCTime(156), desc:'Amber orb observed from rooftop. Video captured. Object made silent 90° turn.' },
+  { id:14, loc:'Mumbai, India', ...gp(19.08, 72.88), shape:'disk', src:'live', time:recentUTCTime(178), desc:'Low-flying disk seen by 200+ witnesses in market district. No sound, blue glow.' },
+  { id:15, loc:'New York, NY', ...gp(40.71, -74.01), shape:'fireball', src:'nuforc', time:recentUTCTime(195), desc:'Bright green fireball descending over Hudson River. Not an aircraft or meteor.' },
+  { id:16, loc:'Area 51, NV', ...gp(37.24, -115.81), shape:'unknown', src:'aaro', time:recentUTCTime(220), desc:'CLASSIFIED INCIDENT. UAP INTERCEPT ATTEMPTED. DETAILS WITHHELD.' },
+  { id:17, loc:'Berlin, Germany', ...gp(52.52, 13.41), shape:'triangle', src:'mufon', time:recentUTCTime(248), desc:'Dark silent triangle reported by police officers. Estimated 200m wingspan.' },
+  { id:18, loc:'Mexico City, MX', ...gp(19.43, -99.13), shape:'orb', src:'nuforc', time:recentUTCTime(275), desc:'Cluster of 7 bright orbs. Filmed by local news helicopter live on air.' },
+  { id:19, loc:'Vancouver, CA', ...gp(49.28, -123.12), shape:'disk', src:'live', time:recentUTCTime(310), desc:'Metallic disk pursued by CF-18 fighter jets. Incident confirmed by Transport Canada.' },
+  { id:20, loc:'Auckland, NZ', ...gp(-36.85, 174.76), shape:'circle', src:'mufon', time:recentUTCTime(340), desc:'Large circular craft over harbour. Multiple boat crews and air traffic control witnesses.' },
+];
+
+function geoCity(name, lat, lng) { const p = geoToPixel(lat, lng); return [name, p[1], p[0], lat, lng]; }
+
+const US_CITIES = [
+  geoCity('San Francisco, CA', 37.77, -122.42), geoCity('Los Angeles, CA', 34.05, -118.24),
+  geoCity('Miami, FL', 25.76, -80.19), geoCity('Houston, TX', 29.76, -95.37),
+  geoCity('Boston, MA', 42.36, -71.06), geoCity('Portland, OR', 45.52, -122.68),
+  geoCity('Minneapolis, MN', 44.98, -93.27), geoCity('Atlanta, GA', 33.75, -84.39),
+  geoCity('Phoenix, AZ', 33.45, -112.07), geoCity('Salt Lake City, UT', 40.76, -111.89),
+  geoCity('Albuquerque, NM', 35.08, -106.65), geoCity('Austin, TX', 30.27, -97.74),
+];
+
+const INT_CITIES = [
+  geoCity('Paris, France', 48.86, 2.35), geoCity('Madrid, Spain', 40.42, -3.70),
+  geoCity('Rome, Italy', 41.90, 12.50), geoCity('Beijing, China', 39.90, 116.40),
+  geoCity('Seoul, Korea', 37.57, 126.98), geoCity('Istanbul, Turkey', 41.01, 28.98),
+  geoCity('Buenos Aires, AR', -34.60, -58.38), geoCity('Cape Town, SA', -33.92, 18.42),
+  geoCity('Nairobi, Kenya', -1.29, 36.82), geoCity('Oslo, Norway', 59.91, 10.75),
+  geoCity('Stockholm, SE', 59.33, 18.07), geoCity('Zurich, CH', 47.38, 8.54),
+];
+
+let allSightings = [...SIGHTING_DATA];
+let visibleSightings = [...allSightings];
+let activeFilter = 'all';
+let totalCount = SIGHTING_DATA.length;
+
+function rand(a, b) { return a + Math.random() * (b - a); }
+function randInt(a, b) { return Math.floor(rand(a, b)); }
+function choice(arr) { return arr[randInt(0, arr.length)]; }
+
+function shapeColor(shape) {
+  return { circle: '#00ccff', triangle: '#ff88aa', disk: '#00ff88', orb: '#ffaa00',
+    unknown: '#ffffff', cylinder: '#88ffcc', chevron: '#ff66aa', fireball: '#ff4400' }[shape] || '#00ff88';
+}
+
+function timeAgo(timeStr) {
+  if (!timeStr) return '';
+  const match = timeStr.match(/(\d{2}):(\d{2}):?(\d{2})?\s*UTC/);
+  if (!match) return '';
+  const now = new Date();
+  const sightTime = new Date(now);
+  sightTime.setUTCHours(parseInt(match[1]), parseInt(match[2]), match[3] ? parseInt(match[3]) : 0, 0);
+  if (sightTime > now) sightTime.setUTCDate(sightTime.getUTCDate() - 1);
+  const diffMs = now - sightTime;
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return 'just now';
+  if (diffMin < 60) return diffMin + 'm ago';
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return diffHr + 'h ago';
+  return Math.floor(diffHr / 24) + 'd ago';
+}
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toUTCString().slice(17, 25) + ' UTC';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+function renderSightings() {
+  const layer = document.getElementById('sightings-layer');
+  layer.innerHTML = '';
+
+  visibleSightings.forEach(s => {
+    const col = shapeColor(s.shape);
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('class','ping');
+    g.setAttribute('transform',`translate(${s.lng},${s.lat})`);
+    g.setAttribute('data-id', s.id);
+
+    const ring = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    ring.setAttribute('class','ping-ring');
+    ring.setAttribute('stroke', col);
+    ring.setAttribute('stroke-width','1.5');
+    ring.setAttribute('r','4');
+    ring.style.animationDelay = `${Math.random()*2}s`;
+
+    const ring2 = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    ring2.setAttribute('class','ping-ring2');
+    ring2.setAttribute('stroke', col);
+    ring2.setAttribute('stroke-width','1');
+    ring2.setAttribute('r','4');
+    ring2.style.animationDelay = `${Math.random()*2 + 0.7}s`;
+
+    const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dot.setAttribute('r','3.5');
+    dot.setAttribute('fill', col);
+    dot.setAttribute('filter','url(#glow-filter)');
+    dot.setAttribute('opacity','0.9');
+    dot.style.pointerEvents = 'none';
+
+    if (s.src === 'aaro') {
+      const sq = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      sq.setAttribute('x','-5'); sq.setAttribute('y','-5');
+      sq.setAttribute('width','10'); sq.setAttribute('height','10');
+      sq.setAttribute('fill','none'); sq.setAttribute('stroke',col);
+      sq.setAttribute('stroke-width','1'); sq.setAttribute('opacity','0.5');
+      sq.style.pointerEvents = 'none';
+      g.appendChild(sq);
+    }
+
+    const hitArea = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    hitArea.setAttribute('r','14');
+    hitArea.setAttribute('fill','transparent');
+    hitArea.setAttribute('style','cursor:pointer');
+
+    g.appendChild(ring); g.appendChild(ring2); g.appendChild(dot); g.appendChild(hitArea);
+
+    hitArea.addEventListener('mouseenter', e => { if (tooltipTimeout) { clearTimeout(tooltipTimeout); tooltipTimeout = null; } showTooltip(s, e); });
+    hitArea.addEventListener('mousemove', e => moveTooltip(e));
+    hitArea.addEventListener('mouseleave', () => { tooltipTimeout = setTimeout(hideTooltip, 200); });
+    hitArea.addEventListener('click', () => { openSightingModal(s); });
+
+    layer.appendChild(g);
+  });
+
+  document.getElementById('showing-count').textContent = visibleSightings.length;
+}
+
+let tooltipTimeout = null;
+
+function showTooltip(s, e) {
+  if (tooltipTimeout) { clearTimeout(tooltipTimeout); tooltipTimeout = null; }
+  const t = document.getElementById('tooltip');
+  document.getElementById('tt-loc').textContent = s.loc;
+  document.getElementById('tt-time').textContent = s.time + ' · ' + timeAgo(s.time);
+  document.getElementById('tt-desc').textContent = s.desc;
+  document.getElementById('tt-source').textContent = 'SOURCE: ' + SOURCE_LABELS[s.src] + ' · SHAPE: ' + s.shape.toUpperCase();
+  const link = document.getElementById('tt-link');
+  link.href = SOURCE_URLS[s.src] || '#';
+  link.textContent = '▸ VIEW ' + SOURCE_LABELS[s.src] + ' REPORT';
+  if (e) moveTooltip(e);
+  t.style.display = 'block';
+}
+function moveTooltip(e) {
+  const t = document.getElementById('tooltip');
+  t.style.left = (e.clientX + 14) + 'px';
+  t.style.top = (e.clientY - 10) + 'px';
+}
+function hideTooltip() { document.getElementById('tooltip').style.display = 'none'; }
+
+function haversineDistance(lat1, lng1, lat2, lng2) {
+  const R = 3959;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng/2) * Math.sin(dLng/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function milesToSvgRadius(miles, atLat) {
+  const degLng = miles / (69.172 * Math.cos(atLat * Math.PI / 180));
+  return degLng * 2.79;
+}
+
+let alertZones = [];
+let alertZonesVisible = false;
+let activeAlertIdx = -1;
+
+function computeAlertZones() {
+  const sightings = allSightings.filter(s => s.geoLat !== undefined);
+  const used = new Set();
+  const zones = [];
+
+  for (let i = 0; i < sightings.length; i++) {
+    if (used.has(sightings[i].id)) continue;
+    const cluster = [sightings[i]];
+    for (let j = i + 1; j < sightings.length; j++) {
+      if (used.has(sightings[j].id)) continue;
+      const dist = haversineDistance(sightings[i].geoLat, sightings[i].geoLng, sightings[j].geoLat, sightings[j].geoLng);
+      if (dist <= 1000) {
+        cluster.push(sightings[j]);
+      }
+    }
+    if (cluster.length >= 3) {
+      let cLat = 0, cLng = 0;
+      cluster.forEach(s => { cLat += s.geoLat; cLng += s.geoLng; });
+      cLat /= cluster.length;
+      cLng /= cluster.length;
+      const cp = geoToPixel(cLat, cLng);
+      const region = cluster[0].loc.split(',').pop().trim();
+      let maxDist = 0;
+      cluster.forEach(s => {
+        const d = haversineDistance(cLat, cLng, s.geoLat, s.geoLng);
+        if (d > maxDist) maxDist = d;
+      });
+      const radiusMiles = Math.max(maxDist * 1.2, 200);
+      zones.push({
+        centerGeoLat: cLat,
+        centerGeoLng: cLng,
+        centerX: cp[0],
+        centerY: cp[1],
+        radiusMiles: Math.min(radiusMiles, 1000),
+        sightings: cluster,
+        region: region,
+        label: cluster.length + ' sightings near ' + cluster[0].loc.split(',')[0]
+      });
+      cluster.forEach(s => used.add(s.id));
+    }
+  }
+  alertZones = zones;
+  return zones;
+}
+
+function updateAlertUI() {
+  const zones = computeAlertZones();
+  document.getElementById('h-alerts').textContent = '⚡ ' + zones.length;
+
+  const alertBox = document.getElementById('alert-box');
+  const alertText = document.getElementById('alert-text');
+
+  if (zones.length === 0) {
+    alertBox.classList.remove('active');
+    alertText.innerHTML = 'No high-activity clusters detected';
+    return;
+  }
+
+  alertBox.classList.add('active');
+  let html = '';
+  zones.forEach((z, idx) => {
+    const shapes = {};
+    z.sightings.forEach(s => { shapes[s.shape] = (shapes[s.shape] || 0) + 1; });
+    const topShape = Object.entries(shapes).sort((a,b) => b[1] - a[1])[0][0];
+    html += '<div class="alert-zone-item' + (idx === activeAlertIdx ? ' active-zone' : '') + '" onclick="focusAlertZone(' + idx + ')">';
+    html += '<div class="alert-zone-name">⚡ ZONE ' + (idx+1) + ': ' + z.label.toUpperCase() + '</div>';
+    html += '<div class="alert-zone-detail">' + z.sightings.length + ' reports within ~' + Math.round(z.radiusMiles) + ' mi · Primary shape: ' + topShape + '</div>';
+    html += '</div>';
+  });
+  alertText.innerHTML = html;
+}
+
+function renderAlertCircles() {
+  const layer = document.getElementById('alert-circles-layer');
+  layer.innerHTML = '';
+  if (!alertZonesVisible) return;
+
+  alertZones.forEach((z, idx) => {
+    const r = milesToSvgRadius(z.radiusMiles, z.centerGeoLat);
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', z.centerX);
+    circle.setAttribute('cy', z.centerY);
+    circle.setAttribute('r', r);
+    circle.setAttribute('class', 'alert-circle');
+    if (idx === activeAlertIdx) {
+      circle.style.fill = 'rgba(255,51,85,0.15)';
+      circle.style.strokeWidth = '3';
+    }
+
+    const dashes = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dashes.setAttribute('cx', z.centerX);
+    dashes.setAttribute('cy', z.centerY);
+    dashes.setAttribute('r', r);
+    dashes.setAttribute('fill', 'none');
+    dashes.setAttribute('stroke', 'rgba(255,51,85,0.3)');
+    dashes.setAttribute('stroke-width', '0.5');
+    dashes.setAttribute('stroke-dasharray', '4,4');
+    dashes.style.pointerEvents = 'none';
+
+    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    label.setAttribute('x', z.centerX);
+    label.setAttribute('y', z.centerY - r - 4);
+    label.setAttribute('class', 'alert-circle-label');
+    label.textContent = '⚠ ZONE ' + (idx+1) + ' · ' + z.sightings.length + ' REPORTS · ' + Math.round(z.radiusMiles) + ' MI RADIUS';
+
+    const countLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    countLabel.setAttribute('x', z.centerX);
+    countLabel.setAttribute('y', z.centerY + 3);
+    countLabel.setAttribute('class', 'alert-circle-label');
+    countLabel.setAttribute('font-size', '7');
+    countLabel.setAttribute('fill', 'rgba(255,51,85,0.5)');
+    countLabel.textContent = '⚡ HIGH ACTIVITY';
+
+    g.appendChild(circle);
+    g.appendChild(dashes);
+    g.appendChild(label);
+    g.appendChild(countLabel);
+    layer.appendChild(g);
+  });
+}
+
+function toggleAlertZones() {
+  if (alertZones.length === 0) {
+    showToast('⚡ NO HIGH ALERT ZONES DETECTED');
+    return;
+  }
+  alertZonesVisible = !alertZonesVisible;
+  activeAlertIdx = -1;
+  renderAlertCircles();
+  if (alertZonesVisible) {
+    showToast('⚡ SHOWING ' + alertZones.length + ' HIGH ALERT ZONE' + (alertZones.length > 1 ? 'S' : ''));
+    if (alertZones.length === 1) {
+      focusAlertZone(0);
+    }
+  } else {
+    resetZoom();
+    showToast('⚡ ALERT ZONES HIDDEN');
+    document.querySelectorAll('.alert-zone-item').forEach(el => el.classList.remove('active-zone'));
+  }
+}
+
+function focusAlertZone(idx) {
+  if (idx < 0 || idx >= alertZones.length) return;
+  alertZonesVisible = true;
+  activeAlertIdx = idx;
+  const z = alertZones[idx];
+
+  renderAlertCircles();
+  updateAlertUI();
+
+  const containerRect = mapContainer.getBoundingClientRect();
+  const displayW = containerRect.width;
+  const displayH = containerRect.height;
+  const baseScaleX = displayW / 1000;
+  const baseScaleY = displayH / 600;
+  const baseScale = Math.min(baseScaleX, baseScaleY);
+
+  const svgR = milesToSvgRadius(z.radiusMiles, z.centerGeoLat);
+  const neededScale = Math.min(displayW, displayH) / (svgR * 2 * baseScale * 1.5);
+  mapScale = Math.max(1.5, Math.min(3.5, neededScale));
+  mapX = displayW / 2 - z.centerX * baseScale * mapScale;
+  mapY = displayH / 2 - z.centerY * baseScale * mapScale;
+  applyMapTransform();
+
+  z.sightings.forEach(s => highlightFeedItem(s.id));
+  showToast('⚡ ZONE ' + (idx+1) + ': ' + z.label.toUpperCase() + ' — ' + z.sightings.length + ' REPORTS');
+}
+
+const SOURCE_COLORS = { nuforc: '#00ccff', mufon: '#00ff88', aaro: '#ff3355', live: '#ffaa00' };
+
+function openSightingModal(s) {
+  hideTooltip();
+  zoomToSighting(s);
+  document.getElementById('sm-location').textContent = s.loc;
+  document.getElementById('sm-time').textContent = s.time + ' · ' + timeAgo(s.time);
+  const shapeEl = document.getElementById('sm-shape');
+  const sc = shapeColor(s.shape);
+  shapeEl.innerHTML = '<span class="sm-shape-tag" style="color:' + sc + ';border-color:' + sc + '">' + s.shape.toUpperCase() + '</span>';
+  const srcEl = document.getElementById('sm-source');
+  const srcColor = SOURCE_COLORS[s.src] || '#00ff88';
+  srcEl.innerHTML = '<span class="sm-source-tag" style="color:var(--dark);background:' + srcColor + '">' + SOURCE_LABELS[s.src] + '</span>';
+  document.getElementById('sm-desc').textContent = s.desc;
+  const link = document.getElementById('sm-link');
+  link.href = SOURCE_URLS[s.src] || '#';
+  link.textContent = '▸ VIEW FULL ' + SOURCE_LABELS[s.src] + ' REPORT';
+  document.getElementById('sighting-modal-overlay').classList.add('active');
+}
+
+function closeSightingModal() {
+  document.getElementById('sighting-modal-overlay').classList.remove('active');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeSightingModal();
+});
+
+function buildFeed() {
+  const container = document.getElementById('feed-container');
+  container.innerHTML = '';
+  [...visibleSightings].forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'feed-item';
+    div.id = 'feed-' + s.id;
+    div.innerHTML = `
+      <span class="source-badge src-${s.src}">${SOURCE_LABELS[s.src]}</span>
+      <div class="fi-time">${s.time} · ${timeAgo(s.time)}</div>
+      <div class="fi-location">${s.loc}</div>
+      <div class="fi-desc">${s.desc}</div>
+      <span class="fi-shape shape-${s.shape}">${s.shape.toUpperCase()}</span>
+    `;
+    div.addEventListener('click', () => { openSightingModal(s); });
+    container.appendChild(div);
+  });
+}
+
+function highlightFeedItem(id) {
+  document.querySelectorAll('.feed-item').forEach(el => el.style.background = '');
+  const el = document.getElementById('feed-' + id);
+  if (el) {
+    el.style.background = 'rgba(0,255,136,0.1)';
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+function zoomToSighting(s) {
+  showToast(`📍 LOCKED: ${s.loc}`);
+  highlightFeedItem(s.id);
+  zoomToSightingOnMap(s);
+}
+
+let mapScale = 1;
+let mapX = 0;
+let mapY = 0;
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let dragStartMapX = 0;
+let dragStartMapY = 0;
+const mapSvg = document.getElementById('map-canvas');
+const mapContainer = document.getElementById('map-container');
+
+function clampPan() {
+  const cw = mapContainer.clientWidth;
+  const ch = mapContainer.clientHeight;
+  const maxPanX = cw * (mapScale - 1);
+  const maxPanY = ch * (mapScale - 1);
+  mapX = Math.max(-maxPanX, Math.min(0, mapX));
+  mapY = Math.max(-maxPanY, Math.min(0, mapY));
+}
+
+function applyMapTransform() {
+  clampPan();
+  mapSvg.style.transform = `translate(${mapX}px, ${mapY}px) scale(${mapScale})`;
+}
+
+function zoomMap(factor) {
+  const oldScale = mapScale;
+  mapScale = Math.max(1, Math.min(5, mapScale * factor));
+  const containerRect = mapContainer.getBoundingClientRect();
+  const cx = containerRect.width / 2;
+  const cy = containerRect.height / 2;
+  mapX = cx - (cx - mapX) * (mapScale / oldScale);
+  mapY = cy - (cy - mapY) * (mapScale / oldScale);
+  applyMapTransform();
+}
+
+function resetZoom() {
+  mapScale = 1; mapX = 0; mapY = 0;
+  applyMapTransform();
+  showToast('🔍 MAP RESET');
+}
+
+function zoomToSightingOnMap(s) {
+  const containerRect = mapContainer.getBoundingClientRect();
+  const displayW = containerRect.width;
+  const displayH = containerRect.height;
+  const baseScaleX = displayW / 1000;
+  const baseScaleY = displayH / 600;
+  const baseScale = Math.min(baseScaleX, baseScaleY);
+  mapScale = 2.5;
+  mapX = displayW / 2 - s.lng * baseScale * mapScale;
+  mapY = displayH / 2 - s.lat * baseScale * mapScale;
+  applyMapTransform();
+  highlightFeedItem(s.id);
+  showToast(`🔍 ZOOMED: ${s.loc} — ${SOURCE_LABELS[s.src]}`);
+}
+
+mapContainer.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const factor = e.deltaY < 0 ? 1.15 : 0.87;
+  const rect = mapContainer.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  const oldScale = mapScale;
+  mapScale = Math.max(1, Math.min(5, mapScale * factor));
+  mapX = mx - (mx - mapX) * (mapScale / oldScale);
+  mapY = my - (my - mapY) * (mapScale / oldScale);
+  applyMapTransform();
+}, { passive: false });
+
+mapContainer.addEventListener('mousedown', (e) => {
+  if (e.target.closest('.ping')) return;
+  isDragging = true;
+  dragStartX = e.clientX; dragStartY = e.clientY;
+  dragStartMapX = mapX; dragStartMapY = mapY;
+  mapContainer.style.cursor = 'grabbing';
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  mapX = dragStartMapX + (e.clientX - dragStartX);
+  mapY = dragStartMapY + (e.clientY - dragStartY);
+  applyMapTransform();
+});
+
+window.addEventListener('mouseup', () => {
+  isDragging = false;
+  mapContainer.style.cursor = 'crosshair';
+});
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function filterSightings(type, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter = type;
+  if (type === 'all') {
+    visibleSightings = [...allSightings];
+  } else if (['nuforc','mufon','aaro'].includes(type)) {
+    visibleSightings = allSightings.filter(s => s.src === type);
+  } else {
+    visibleSightings = allSightings.filter(s => s.shape === type);
+  }
+  renderSightings();
+  buildFeed();
+}
+
+function updateShapeStats() {
+  const counts = {};
+  allSightings.forEach(s => { counts[s.shape] = (counts[s.shape]||0)+1; });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const max = sorted[0][1];
+  const container = document.getElementById('shape-stats');
+  container.innerHTML = '';
+  sorted.forEach(([shape, cnt]) => {
+    const pct = Math.round(cnt/max*100);
+    const col = shapeColor(shape);
+    container.innerHTML += `
+      <div class="shape-row">
+        <div class="sr-name" style="color:${col}">${shape.toUpperCase()}</div>
+        <div class="sr-bar-wrap"><div class="sr-bar" style="width:${pct}%;background:${col}"></div></div>
+        <div class="sr-count">${cnt}</div>
+      </div>
+    `;
+  });
+  const sc = {nuforc:0,mufon:0,aaro:0};
+  allSightings.forEach(s => { if(sc[s.src]!==undefined) sc[s.src]++; });
+  const total = allSightings.length;
+  document.getElementById('cnt-nuforc').textContent = sc.nuforc;
+  document.getElementById('cnt-mufon').textContent = sc.mufon;
+  document.getElementById('cnt-aaro').textContent = sc.aaro;
+  document.getElementById('bar-nuforc').style.width = Math.round(sc.nuforc/total*100)+'%';
+  document.getElementById('bar-mufon').style.width = Math.round(sc.mufon/total*100)+'%';
+  document.getElementById('bar-aaro').style.width = Math.round(sc.aaro/total*100)+'%';
+}
+
+let todayCount = randInt(12, 25);
+let weekCount = 820 + randInt(0, 40);
+
+function updateHeader() {
+  document.getElementById('h-total').textContent = totalCount.toLocaleString();
+  document.getElementById('h-today').textContent = todayCount;
+}
+
+function updateAnalytics() {
+  document.getElementById('r-week').textContent = weekCount.toLocaleString();
+
+  const regionCounts = {};
+  allSightings.forEach(s => {
+    const region = getRegion(s.loc);
+    regionCounts[region] = (regionCounts[region] || 0) + 1;
+  });
+  let topRegion = 'SW UNITED STATES';
+  let topCount = 0;
+  Object.entries(regionCounts).forEach(([r, c]) => {
+    if (c > topCount) { topCount = c; topRegion = r; }
+  });
+  document.getElementById('r-hotspot').textContent = topRegion;
+  document.getElementById('r-hotspot-sub').textContent = topCount + ' sightings in 24hrs';
+
+  const weekPrev = weekCount - randInt(15, 40);
+  const pctChange = Math.round(((weekCount - weekPrev) / weekPrev) * 100);
+  document.getElementById('r-week-change').textContent = '↑ ' + pctChange + '% vs last week';
+}
+
+function getRegion(loc) {
+  const sw = ['Phoenix', 'Las Vegas', 'Roswell', 'Albuquerque', 'Los Angeles', 'San Francisco', 'Area 51', 'Salt Lake'];
+  const se = ['Miami', 'Atlanta', 'Houston', 'Austin'];
+  const ne = ['New York', 'Boston', 'Toronto', 'Chicago'];
+  const nw = ['Seattle', 'Portland', 'Vancouver'];
+  const eu = ['London', 'Berlin', 'Paris', 'Madrid', 'Rome', 'Oslo', 'Stockholm', 'Zurich'];
+  const asia = ['Tokyo', 'Beijing', 'Seoul', 'Mumbai', 'Istanbul'];
+  const sa = ['São Paulo', 'Buenos Aires', 'Mexico City'];
+  const af = ['Cairo', 'Cape Town', 'Nairobi'];
+  const oc = ['Sydney', 'Auckland'];
+
+  for (const name of sw) if (loc.includes(name)) return 'SW UNITED STATES';
+  for (const name of se) if (loc.includes(name)) return 'SE UNITED STATES';
+  for (const name of ne) if (loc.includes(name)) return 'NE UNITED STATES';
+  for (const name of nw) if (loc.includes(name)) return 'NW UNITED STATES';
+  for (const name of eu) if (loc.includes(name)) return 'WESTERN EUROPE';
+  for (const name of asia) if (loc.includes(name)) return 'ASIA PACIFIC';
+  for (const name of sa) if (loc.includes(name)) return 'LATIN AMERICA';
+  for (const name of af) if (loc.includes(name)) return 'AFRICA / MIDEAST';
+  for (const name of oc) if (loc.includes(name)) return 'OCEANIA';
+  return 'UNKNOWN REGION';
+}
+
+let nextId = 100;
+
+function addLiveSighting() {
+  const allCities = [...US_CITIES, ...INT_CITIES];
+  const city = choice(allCities);
+  const shape = choice(SHAPES);
+  const src = choice(SOURCES);
+  const now = new Date();
+  const timeStr = now.toUTCString().slice(17,25) + ' UTC';
+  const descriptions = [
+    'Unidentified object hovering silently. No navigation lights. Vanished instantly.',
+    'Fast-moving lights in V-formation. No sound. Tracked for 4 minutes.',
+    'Bright pulsing orb over city center. Witnessed by dozens. Videos circulating.',
+    'Disc-shaped craft with rotating lights. Military jets scrambled.',
+    'Elongated object moving against wind. No exhaust trail visible.',
+    'Object performed 90° turn at high speed. Impossible for known aircraft.',
+    'Cluster of lights dancing in the sky for 30 minutes. Multiple independent reports.',
+    'Large silent craft blocked stars. Estimated 200m in length.',
+  ];
+  const gLat = city[3] + (Math.random() - 0.5) * 2;
+  const gLng = city[4] + (Math.random() - 0.5) * 2;
+  const pix = geoToPixel(gLat, gLng);
+  const s = {
+    id: nextId++, loc: city[0],
+    lat: pix[1], lng: pix[0], geoLat: gLat, geoLng: gLng,
+    shape, src, time: timeStr, desc: choice(descriptions)
+  };
+  allSightings.unshift(s);
+  totalCount++;
+  todayCount++;
+  weekCount++;
+  if (activeFilter === 'all' ||
+      (SOURCES.includes(activeFilter) && s.src === activeFilter) ||
+      (SHAPES.includes(activeFilter) && s.shape === activeFilter)) {
+    visibleSightings.unshift(s);
+    renderSightings();
+    buildFeed();
+  }
+  updateHeader();
+  updateShapeStats();
+  updateAnalytics();
+  updateAlertUI();
+  if (alertZonesVisible) renderAlertCircles();
+  showToast(`🛸 NEW SIGHTING: ${s.loc} — ${s.shape.toUpperCase()}`);
+}
+
+function buildTicker() {
+  const items = allSightings.map(s =>
+    `▸ ${s.loc}: ${s.shape.toUpperCase()} reported at ${s.time} via ${SOURCE_LABELS[s.src]}`
+  ).join('   ·   ');
+  document.getElementById('ticker').textContent = items;
+}
+
+renderSightings();
+buildFeed();
+updateShapeStats();
+updateHeader();
+updateAnalytics();
+buildTicker();
+updateAlertUI();
+
+setInterval(addLiveSighting, 6000 + Math.random()*4000);
+setInterval(buildTicker, 30000);
+
+let displayed = 0;
+const target = SIGHTING_DATA.length;
+const countUp = setInterval(() => {
+  displayed += 3;
+  if (displayed >= target) { displayed = target; clearInterval(countUp); }
+  document.getElementById('h-total').textContent = displayed;
+}, 30);
+
+setTimeout(() => showToast('ALIEN SCANNER ONLINE — MAKE ALIENS GREAT AGAIN'), 800);
+
+function switchMobileTab(tab) {
+  const left = document.getElementById('left-panel');
+  const map = document.getElementById('map-container');
+  const right = document.getElementById('right-panel');
+  const tabs = document.querySelectorAll('.mobile-tab');
+
+  left.classList.remove('mobile-visible');
+  map.classList.remove('mobile-hidden');
+  right.classList.remove('mobile-visible');
+  tabs.forEach(t => t.classList.remove('active'));
+
+  if (tab === 'feed') {
+    left.classList.add('mobile-visible');
+    map.classList.add('mobile-hidden');
+    tabs[0].classList.add('active');
+  } else if (tab === 'map') {
+    tabs[1].classList.add('active');
+  } else if (tab === 'stats') {
+    right.classList.add('mobile-visible');
+    map.classList.add('mobile-hidden');
+    tabs[2].classList.add('active');
+  }
+}
+
+let touchStartDist = 0;
+let touchStartScale = 1;
+let touchStartX = 0;
+let touchStartY = 0;
+let touchStartMapX = 0;
+let touchStartMapY = 0;
+let isTouchDragging = false;
+let touchMoved = false;
+
+function getTouchDist(t1, t2) {
+  const dx = t1.clientX - t2.clientX;
+  const dy = t1.clientY - t2.clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+function getTouchCenter(t1, t2) {
+  return { x: (t1.clientX + t2.clientX) / 2, y: (t1.clientY + t2.clientY) / 2 };
+}
+
+mapContainer.addEventListener('touchstart', (e) => {
+  if (e.target.closest('.zoom-btn')) return;
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    touchStartDist = getTouchDist(e.touches[0], e.touches[1]);
+    touchStartScale = mapScale;
+    const center = getTouchCenter(e.touches[0], e.touches[1]);
+    touchStartX = center.x;
+    touchStartY = center.y;
+    touchStartMapX = mapX;
+    touchStartMapY = mapY;
+    isTouchDragging = false;
+  } else if (e.touches.length === 1) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartMapX = mapX;
+    touchStartMapY = mapY;
+    isTouchDragging = true;
+    touchMoved = false;
+  }
+}, { passive: false });
+
+mapContainer.addEventListener('touchmove', (e) => {
+  if (e.target.closest('.zoom-btn')) return;
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    const dist = getTouchDist(e.touches[0], e.touches[1]);
+    const center = getTouchCenter(e.touches[0], e.touches[1]);
+    const rect = mapContainer.getBoundingClientRect();
+    const mx = center.x - rect.left;
+    const my = center.y - rect.top;
+    const oldScale = mapScale;
+    mapScale = Math.max(1, Math.min(5, touchStartScale * (dist / touchStartDist)));
+    mapX = mx - (mx - touchStartMapX) * (mapScale / oldScale);
+    mapY = my - (my - touchStartMapY) * (mapScale / oldScale);
+
+    touchStartMapX = mapX;
+    touchStartMapY = mapY;
+    touchStartX = center.x;
+    touchStartY = center.y;
+
+    applyMapTransform();
+    isTouchDragging = false;
+  } else if (e.touches.length === 1 && isTouchDragging) {
+    const dx = e.touches[0].clientX - touchStartX;
+    const dy = e.touches[0].clientY - touchStartY;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) touchMoved = true;
+    if (mapScale > 1) {
+      e.preventDefault();
+      mapX = touchStartMapX + dx;
+      mapY = touchStartMapY + dy;
+      applyMapTransform();
+    }
+  }
+}, { passive: false });
+
+mapContainer.addEventListener('touchend', (e) => {
+  isTouchDragging = false;
+}, { passive: true });
+
+const origShowTooltip = showTooltip;
+const origPingListeners = [];
+
+function setupTouchPings() {
+  document.querySelectorAll('.ping').forEach(ping => {
+    ping.addEventListener('touchstart', (e) => {
+      e.stopPropagation();
+    }, { passive: true });
+    ping.addEventListener('touchend', (e) => {
+      if (touchMoved) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const id = parseInt(ping.getAttribute('data-id'));
+      const s = allSightings.find(s => s.id === id);
+      if (s) {
+        const tooltip = document.getElementById('tooltip');
+        document.getElementById('tt-loc').textContent = s.loc;
+        document.getElementById('tt-time').textContent = s.time + ' · ' + timeAgo(s.time);
+        document.getElementById('tt-desc').textContent = s.desc;
+        document.getElementById('tt-source').textContent = 'SOURCE: ' + SOURCE_LABELS[s.src] + ' · SHAPE: ' + s.shape.toUpperCase();
+        const link = document.getElementById('tt-link');
+        link.href = SOURCE_URLS[s.src] || '#';
+        link.textContent = '▸ VIEW ' + SOURCE_LABELS[s.src] + ' REPORT';
+        tooltip.style.display = 'block';
+        highlightFeedItem(s.id);
+        showToast(`📍 LOCKED: ${s.loc}`);
+      }
+    }, { passive: false });
+  });
+}
+
+const origRender = renderSightings;
+const _origRenderSightings = renderSightings;
+renderSightings = function() {
+  _origRenderSightings();
+  if (window.innerWidth <= 768) {
+    setupTouchPings();
+  }
+};
+
+document.addEventListener('click', (e) => {
+  const tooltip = document.getElementById('tooltip');
+  if (tooltip.style.display === 'block' && !tooltip.contains(e.target) && !e.target.closest('.ping')) {
+    hideTooltip();
+  }
+});
+document.addEventListener('touchstart', (e) => {
+  const tooltip = document.getElementById('tooltip');
+  if (tooltip.style.display === 'block' && !tooltip.contains(e.target) && !e.target.closest('.ping')) {
+    hideTooltip();
+  }
+}, { passive: true });
+
+if (window.innerWidth <= 768) {
+  setupTouchPings();
+}
+</script>
+</body>
+</html>
