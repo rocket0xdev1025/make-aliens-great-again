@@ -19902,7 +19902,7 @@ function IS() {
       p = !y || v - Number(y) > 864e5;
     p && localStorage.setItem(m, String(v));
     const x = (E) =>
-      fetch("/api/views", { method: E ? "POST" : "GET" })
+      fetch("https://api-maga-eight.vercel.app/api/views", { method: E ? "POST" : "GET" })
         .then((O) => O.json())
         .then((O) => c(O.count ?? null))
         .catch(() => {});
@@ -20043,7 +20043,7 @@ function IS() {
                   "flex items-center justify-center gap-1 sm:gap-1.5 flex-wrap",
                 children: [
                   u.jsxs("a", {
-                    href: "https://x.com/MAGA_Aliens",
+                    href: "https://x.com/Aliens_MAGA",
                     target: "_blank",
                     rel: "noreferrer",
                     className:
@@ -20066,7 +20066,7 @@ function IS() {
                     ],
                   }),
                   u.jsxs("a", {
-                    href: "https://t.me/MakeAliensGreatAgain",
+                    href: "https://t.me/Aliens_MAGA",
                     target: "_blank",
                     rel: "noreferrer",
                     className:
@@ -20087,265 +20087,6 @@ function IS() {
                         children: "TELEGRAM",
                       }),
                       u.jsx("span", { className: "sm:hidden", children: "TG" }),
-                    ],
-                  }),
-                  u.jsxs("a", {
-                    href: "/whitepaper",
-                    className:
-                      "relative nav-link-btn border-white/50 text-white hover:bg-white/10 hover:border-white/80",
-                    "data-testid": "link-nav-tokenomics",
-                    children: [
-                      u.jsxs("svg", {
-                        viewBox: "0 0 24 24",
-                        className: "nav-icon",
-                        "aria-hidden": "true",
-                        children: [
-                          u.jsx("path", {
-                            d: "M4 19.5A2.5 2.5 0 016.5 17H20",
-                            fill: "none",
-                            stroke: "currentColor",
-                            strokeWidth: "1.5",
-                            strokeLinecap: "round",
-                            strokeLinejoin: "round",
-                          }),
-                          u.jsx("path", {
-                            d: "M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z",
-                            fill: "none",
-                            stroke: "currentColor",
-                            strokeWidth: "1.5",
-                            strokeLinecap: "round",
-                            strokeLinejoin: "round",
-                          }),
-                          u.jsx("path", {
-                            d: "M9 7h6M9 11h4",
-                            stroke: "currentColor",
-                            strokeWidth: "1.2",
-                            strokeLinecap: "round",
-                            opacity: "0.6",
-                          }),
-                        ],
-                      }),
-                      u.jsx("span", {
-                        className: "hidden sm:inline",
-                        children: "TOKENOMICS / WHITEPAPER",
-                      }),
-                      u.jsx("span", {
-                        className: "sm:hidden",
-                        children: "TOKENOMICS",
-                      }),
-                    ],
-                  }),
-                ],
-              }),
-              u.jsxs("div", {
-                className:
-                  "flex items-center justify-center gap-1 sm:gap-1.5 flex-wrap mt-1.5",
-                children: [
-                  u.jsxs("a", {
-                    href: "/alien-scanner.html",
-                    className:
-                      "relative nav-feature-btn border-purple-400/80 text-purple-200 hover:border-purple-200",
-                    "data-testid": "link-nav-scanner",
-                    style: {
-                      animation: "scannerPulse 2.5s ease-in-out infinite",
-                    },
-                    children: [
-                      u.jsxs("svg", {
-                        viewBox: "0 0 24 24",
-                        className: "h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0",
-                        "aria-hidden": "true",
-                        children: [
-                          u.jsx("circle", {
-                            cx: "12",
-                            cy: "12",
-                            r: "10",
-                            fill: "none",
-                            stroke: "currentColor",
-                            strokeWidth: "1",
-                            opacity: "0.3",
-                          }),
-                          u.jsx("circle", {
-                            cx: "12",
-                            cy: "12",
-                            r: "7",
-                            fill: "none",
-                            stroke: "currentColor",
-                            strokeWidth: "1",
-                            opacity: "0.4",
-                          }),
-                          u.jsx("circle", {
-                            cx: "12",
-                            cy: "12",
-                            r: "4",
-                            fill: "none",
-                            stroke: "currentColor",
-                            strokeWidth: "1",
-                            opacity: "0.6",
-                          }),
-                          u.jsx("circle", {
-                            cx: "12",
-                            cy: "12",
-                            r: "1.5",
-                            fill: "currentColor",
-                            opacity: "0.8",
-                          }),
-                          u.jsx("line", {
-                            x1: "12",
-                            y1: "12",
-                            x2: "18",
-                            y2: "6",
-                            stroke: "currentColor",
-                            strokeWidth: "1.5",
-                            strokeLinecap: "round",
-                          }),
-                          u.jsx("circle", {
-                            cx: "18",
-                            cy: "6",
-                            r: "2",
-                            fill: "#a855f7",
-                            opacity: "0.9",
-                            children: u.jsx("animate", {
-                              attributeName: "opacity",
-                              values: "0.9;0.3;0.9",
-                              dur: "1.5s",
-                              repeatCount: "indefinite",
-                            }),
-                          }),
-                        ],
-                      }),
-                      u.jsx("span", {
-                        className: "hidden sm:inline",
-                        children: "ALIEN SCANNER",
-                      }),
-                      u.jsx("span", {
-                        className: "sm:hidden",
-                        children: "SCANNER",
-                      }),
-                      u.jsx("span", {
-                        className:
-                          "absolute -top-1.5 -right-1.5 bg-purple-500 text-white text-[7px] sm:text-[8px] font-bold px-1 py-0.5 rounded-sm leading-none tracking-wider animate-bounce",
-                        children: "LIVE",
-                      }),
-                    ],
-                  }),
-                  u.jsxs("a", {
-                    href: "/generator",
-                    className:
-                      "relative nav-feature-btn border-lime-400/80 text-lime-300 hover:border-lime-200",
-                    "data-testid": "link-nav-generator",
-                    style: { animation: "alienPulse 2s ease-in-out infinite" },
-                    children: [
-                      u.jsx("span", {
-                        className: "hidden sm:inline",
-                        children: "GENERATE MAGA ALIEN",
-                      }),
-                      u.jsx("span", {
-                        className: "sm:hidden",
-                        children: "AI ALIEN",
-                      }),
-                      u.jsx("span", {
-                        className:
-                          "absolute -top-1.5 -right-1.5 bg-lime-500 text-black text-[7px] sm:text-[8px] font-bold px-1 py-0.5 rounded-sm leading-none tracking-wider animate-pulse",
-                        children: "AI",
-                      }),
-                    ],
-                  }),
-                  u.jsxs("a", {
-                    href: "/chart",
-                    className:
-                      "relative nav-feature-btn border-yellow-400/80 text-yellow-300 hover:border-yellow-200",
-                    "data-testid": "link-nav-chart",
-                    children: [
-                      u.jsxs("svg", {
-                        viewBox: "0 0 24 24",
-                        className: "h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0",
-                        "aria-hidden": "true",
-                        children: [
-                          u.jsx("path", {
-                            d: "M3 20h18",
-                            stroke: "currentColor",
-                            strokeWidth: "1.5",
-                            strokeLinecap: "round",
-                          }),
-                          u.jsx("path", {
-                            d: "M4 17l4-5 3 2 5-7 4 4",
-                            fill: "none",
-                            stroke: "currentColor",
-                            strokeWidth: "1.5",
-                            strokeLinecap: "round",
-                            strokeLinejoin: "round",
-                          }),
-                        ],
-                      }),
-                      u.jsx("span", {
-                        className: "hidden sm:inline",
-                        children: "LIVE CHART",
-                      }),
-                      u.jsx("span", {
-                        className: "sm:hidden",
-                        children: "CHART",
-                      }),
-                    ],
-                  }),
-                  u.jsxs("span", {
-                    className:
-                      "relative nav-feature-btn border-white/15 text-white/30 cursor-default",
-                    "data-testid": "link-nav-aliens-gov",
-                    children: [
-                      u.jsxs("svg", {
-                        viewBox: "0 0 24 24",
-                        className: "h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0",
-                        "aria-hidden": "true",
-                        children: [
-                          u.jsx("path", {
-                            d: "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z",
-                            fill: "none",
-                            stroke: "rgba(255,255,255,0.3)",
-                            strokeWidth: "1.5",
-                            strokeLinecap: "round",
-                            strokeLinejoin: "round",
-                          }),
-                          u.jsx("polyline", {
-                            points: "14 2 14 8 20 8",
-                            fill: "none",
-                            stroke: "rgba(255,255,255,0.3)",
-                            strokeWidth: "1.5",
-                            strokeLinecap: "round",
-                            strokeLinejoin: "round",
-                          }),
-                          u.jsx("line", {
-                            x1: "16",
-                            y1: "13",
-                            x2: "8",
-                            y2: "13",
-                            stroke: "rgba(255,255,255,0.3)",
-                            strokeWidth: "1.5",
-                            strokeLinecap: "round",
-                          }),
-                          u.jsx("line", {
-                            x1: "16",
-                            y1: "17",
-                            x2: "8",
-                            y2: "17",
-                            stroke: "rgba(255,255,255,0.3)",
-                            strokeWidth: "1.5",
-                            strokeLinecap: "round",
-                          }),
-                        ],
-                      }),
-                      u.jsx("span", {
-                        className: "hidden sm:inline",
-                        children: "ALIENS.GOV",
-                      }),
-                      u.jsx("span", {
-                        className: "sm:hidden",
-                        children: "A.GOV",
-                      }),
-                      u.jsx("span", {
-                        className:
-                          "absolute -top-1.5 -right-1.5 bg-yellow-500 text-black text-[7px] sm:text-[8px] font-bold px-1 py-0.5 rounded-sm leading-none tracking-wider animate-pulse",
-                        children: "LOADING",
-                      }),
                     ],
                   }),
                 ],
@@ -20387,7 +20128,7 @@ function IS() {
                       "flex flex-wrap justify-center gap-2 sm:gap-3 mb-3",
                     children: [
                       u.jsxs("a", {
-                        href: "https://t.me/MakeAliensGreatAgain",
+                        href: "https://t.me/Aliens_MAGA",
                         target: "_blank",
                         rel: "noreferrer",
                         className:
@@ -20411,30 +20152,7 @@ function IS() {
                         ],
                       }),
                       u.jsxs("a", {
-                        href: "https://x.com/i/communities/2024688028380229738",
-                        target: "_blank",
-                        rel: "noreferrer",
-                        className:
-                          "border border-white/30 text-white font-mono text-[11px] sm:text-sm font-bold uppercase tracking-wider px-4 py-2.5 hover:bg-white/10 hover:border-white/60 transition-all flex items-center gap-2",
-                        "data-testid": "link-footer-community",
-                        style: {
-                          background:
-                            "linear-gradient(135deg,rgba(255,255,255,0.06),transparent)",
-                        },
-                        children: [
-                          u.jsx("svg", {
-                            viewBox: "0 0 24 24",
-                            className: "h-4 w-4 fill-current flex-shrink-0",
-                            "aria-hidden": "true",
-                            children: u.jsx("path", {
-                              d: "M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z",
-                            }),
-                          }),
-                          "COMMUNITY",
-                        ],
-                      }),
-                      u.jsxs("a", {
-                        href: "https://x.com/MAGA_Aliens",
+                        href: "https://x.com/Aliens_MAGA",
                         target: "_blank",
                         rel: "noreferrer",
                         className:
@@ -20460,150 +20178,10 @@ function IS() {
                   }),
                   u.jsxs("div", {
                     className:
-                      "flex flex-wrap justify-center gap-2 sm:gap-3 mb-3",
-                    children: [
-                      u.jsxs("a", {
-                        href: "/whitepaper",
-                        className:
-                          "border border-white/30 text-white font-mono text-[11px] sm:text-sm font-bold uppercase tracking-wider px-4 py-2.5 hover:bg-white/10 hover:border-white/60 transition-all flex items-center gap-2",
-                        "data-testid": "link-footer-whitepaper",
-                        style: {
-                          background:
-                            "linear-gradient(135deg,rgba(255,255,255,0.06),transparent)",
-                        },
-                        children: [
-                          u.jsxs("svg", {
-                            viewBox: "0 0 24 24",
-                            className: "h-4 w-4 flex-shrink-0",
-                            "aria-hidden": "true",
-                            children: [
-                              u.jsx("path", {
-                                d: "M4 19.5A2.5 2.5 0 016.5 17H20",
-                                fill: "none",
-                                stroke: "currentColor",
-                                strokeWidth: "1.5",
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                              }),
-                              u.jsx("path", {
-                                d: "M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z",
-                                fill: "none",
-                                stroke: "currentColor",
-                                strokeWidth: "1.5",
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                              }),
-                            ],
-                          }),
-                          "TOKENOMICS / WHITEPAPER",
-                        ],
-                      }),
-                      u.jsxs("a", {
-                        href: "/alien-scanner.html",
-                        className:
-                          "border border-purple-400/60 text-purple-200 font-mono text-[11px] sm:text-sm font-bold uppercase tracking-wider px-4 py-2.5 hover:bg-purple-500/15 hover:border-purple-300 transition-all flex items-center gap-2",
-                        "data-testid": "link-footer-scanner",
-                        style: {
-                          background:
-                            "linear-gradient(135deg,rgba(168,85,247,0.08),transparent)",
-                        },
-                        children: [
-                          u.jsxs("svg", {
-                            viewBox: "0 0 24 24",
-                            className: "h-4 w-4 flex-shrink-0",
-                            "aria-hidden": "true",
-                            children: [
-                              u.jsx("circle", {
-                                cx: "12",
-                                cy: "12",
-                                r: "9",
-                                fill: "none",
-                                stroke: "currentColor",
-                                strokeWidth: "1.5",
-                                opacity: "0.6",
-                              }),
-                              u.jsx("circle", {
-                                cx: "12",
-                                cy: "12",
-                                r: "1.5",
-                                fill: "currentColor",
-                              }),
-                              u.jsx("line", {
-                                x1: "12",
-                                y1: "12",
-                                x2: "17",
-                                y2: "7",
-                                stroke: "currentColor",
-                                strokeWidth: "1.5",
-                                strokeLinecap: "round",
-                              }),
-                            ],
-                          }),
-                          "ALIEN SCANNER",
-                        ],
-                      }),
-                      u.jsx("a", {
-                        href: "/generator",
-                        className:
-                          "border border-lime-400/60 text-lime-300 font-mono text-[11px] sm:text-sm font-bold uppercase tracking-wider px-4 py-2.5 hover:bg-lime-500/15 hover:border-lime-300 transition-all flex items-center gap-2",
-                        "data-testid": "link-footer-generator",
-                        style: {
-                          background:
-                            "linear-gradient(135deg,rgba(132,204,22,0.08),transparent)",
-                        },
-                        children: "GENERATE MAGA ALIEN",
-                      }),
-                    ],
-                  }),
-                  u.jsxs("div", {
-                    className: "flex flex-col items-center mb-4 mt-2",
-                    children: [
-                      u.jsx("p", {
-                        className:
-                          "text-white/30 font-mono text-[10px] uppercase tracking-[0.2em] mb-2",
-                        children: "Contact",
-                      }),
-                      u.jsxs("a", {
-                        href: "mailto:info@makealiensgreatagain.com",
-                        className:
-                          "border border-primary/50 text-primary/80 font-mono text-[11px] sm:text-sm font-bold uppercase tracking-wider px-4 py-2.5 hover:bg-primary/10 hover:border-primary hover:text-primary transition-all flex items-center gap-2",
-                        "data-testid": "link-footer-email",
-                        style: {
-                          background:
-                            "linear-gradient(135deg,rgba(220,38,38,0.08),transparent)",
-                        },
-                        children: [
-                          u.jsxs("svg", {
-                            viewBox: "0 0 24 24",
-                            className: "h-4 w-4 flex-shrink-0",
-                            fill: "none",
-                            stroke: "currentColor",
-                            strokeWidth: "1.5",
-                            strokeLinecap: "round",
-                            strokeLinejoin: "round",
-                            "aria-hidden": "true",
-                            children: [
-                              u.jsx("rect", {
-                                x: "2",
-                                y: "4",
-                                width: "20",
-                                height: "16",
-                                rx: "2",
-                              }),
-                              u.jsx("path", { d: "M2 7l10 7 10-7" }),
-                            ],
-                          }),
-                          "info@makealiensgreatagain.com",
-                        ],
-                      }),
-                    ],
-                  }),
-                  u.jsxs("div", {
-                    className:
                       "flex flex-wrap justify-center gap-2 sm:gap-3 mb-6",
                     children: [
                       u.jsxs("a", {
-                        href: "https://dexscreener.com/solana/hvimk99ygssdnwz9esqumdthrfz4dade7j6phmfms6at",
+                        href: "https://dexscreener.com/ethereum/0xcomingsoon",
                         target: "_blank",
                         rel: "noreferrer",
                         className:
@@ -20623,7 +20201,7 @@ function IS() {
                         ],
                       }),
                       u.jsxs("a", {
-                        href: "https://www.dextools.io/app/token/makealiensgreatagain",
+                        href: "https://www.dextools.io/app/en/ether/pair-explorer/0xcomingsoon",
                         target: "_blank",
                         rel: "noreferrer",
                         className:
@@ -20640,60 +20218,6 @@ function IS() {
                             className: "h-4 w-4 flex-shrink-0",
                           }),
                           "DEXTOOLS",
-                        ],
-                      }),
-                      u.jsxs("a", {
-                        href: "https://pump.fun/coin/0xcomingsoon",
-                        target: "_blank",
-                        rel: "noreferrer",
-                        className:
-                          "border border-orange-500/50 text-orange-300 font-mono text-[11px] sm:text-sm font-bold uppercase tracking-wider px-4 py-2.5 hover:bg-orange-500/15 hover:border-orange-400 transition-all flex items-center gap-2",
-                        "data-testid": "link-footer-pumpfun",
-                        style: {
-                          background:
-                            "linear-gradient(135deg,rgba(249,115,22,0.08),transparent)",
-                        },
-                        children: [
-                          u.jsx("img", {
-                            src: "/pumpfun-logo.png",
-                            alt: "",
-                            className: "h-4 w-4 flex-shrink-0",
-                          }),
-                          "PUMP.FUN",
-                        ],
-                      }),
-                      u.jsxs("a", {
-                        href: "/chart",
-                        className:
-                          "border border-yellow-500/50 text-yellow-300 font-mono text-[11px] sm:text-sm font-bold uppercase tracking-wider px-4 py-2.5 hover:bg-yellow-500/15 hover:border-yellow-400 transition-all flex items-center gap-2",
-                        "data-testid": "link-footer-chart",
-                        style: {
-                          background:
-                            "linear-gradient(135deg,rgba(234,179,8,0.08),transparent)",
-                        },
-                        children: [
-                          u.jsxs("svg", {
-                            viewBox: "0 0 24 24",
-                            className: "h-4 w-4 flex-shrink-0",
-                            "aria-hidden": "true",
-                            children: [
-                              u.jsx("path", {
-                                d: "M3 20h18",
-                                stroke: "#facc15",
-                                strokeWidth: "1.5",
-                                strokeLinecap: "round",
-                              }),
-                              u.jsx("path", {
-                                d: "M4 17l4-5 3 2 5-7 4 4",
-                                fill: "none",
-                                stroke: "#facc15",
-                                strokeWidth: "1.5",
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                              }),
-                            ],
-                          }),
-                          "LIVE CHART",
                         ],
                       }),
                     ],
@@ -20720,7 +20244,7 @@ function eE({ url: a }) {
     [r, c] = w.useState(a);
   return (
     w.useEffect(() => {
-      fetch("/api/media-url/trailer")
+      fetch("https://api-maga-eight.vercel.app/api/media-url/trailer")
         .then((f) => (f.ok ? f.json() : null))
         .then((f) => {
           f?.url && c(f.url);
@@ -20749,12 +20273,12 @@ function eE({ url: a }) {
 }
 function tE({ spaceBg: a }) {
   const { data: i } = Ti({
-      queryKey: ["/api/trailer"],
-      queryFn: async () => (await fetch("/api/trailer")).json(),
+      queryKey: ["https://api-maga-eight.vercel.app/api/trailer"],
+      queryFn: async () => (await fetch("https://api-maga-eight.vercel.app/api/trailer")).json(),
     }),
     { data: r } = Ti({
-      queryKey: ["/api/generated-images"],
-      queryFn: async () => (await fetch("/api/generated-images")).json(),
+      queryKey: ["https://api-maga-eight.vercel.app/api/generated-images"],
+      queryFn: async () => (await fetch("https://api-maga-eight.vercel.app/api/generated-images")).json(),
       refetchInterval: 1e4,
     }),
     c = Sg(),
@@ -20762,6 +20286,7 @@ function tE({ spaceBg: a }) {
       try {
         const j = localStorage.getItem("maga-voted-ids");
         return j ? new Set(JSON.parse(j)) : new Set();
+        console.log(queryFn);
       } catch {
         return new Set();
       }
@@ -20770,7 +20295,7 @@ function tE({ spaceBg: a }) {
       ...(r || []).map((j, L) => ({
         id: String(L + 1).padStart(3, "0"),
         dbId: j.id,
-        src: j.url,
+        src: `https://www.makealiensgreatagain.com/${j.url}`.replace(/\/+/g, '/'),
         title:
           j.caption ||
           `AI: ${(j.alienType || "alien").toUpperCase()} - ${(
@@ -20784,7 +20309,7 @@ function tE({ spaceBg: a }) {
       if (!f.has(j)) {
         y.current = j;
         try {
-          await fetch(`/api/generated-images/${j}/vote`, { method: "POST" }),
+          await fetch(`https://api-maga-eight.vercel.app/api/generated-images/${j}/vote`, { method: "POST" }),
             h((L) => {
               const G = new Set(L).add(j);
               try {
@@ -20792,7 +20317,7 @@ function tE({ spaceBg: a }) {
               } catch {}
               return G;
             }),
-            c.invalidateQueries({ queryKey: ["/api/generated-images"] });
+            c.invalidateQueries({ queryKey: ["https://api-maga-eight.vercel.app/api/generated-images"] });
         } catch {}
       }
     },
@@ -20836,12 +20361,12 @@ function tE({ spaceBg: a }) {
                 children: "ALIEN CHRONICLES",
               }),
               u.jsx("a", {
-                href: "/generator",
+                href: "https://app.uniswap.org/#/swap?inputCurrency=eth&outputCurrency=0xcomingsoon",
                 className:
                   "inline-flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6 px-4 sm:px-12 py-3 sm:py-6 bg-primary hover:bg-primary/80 text-white font-black text-base sm:text-2xl md:text-3xl uppercase tracking-widest transition-all mx-auto border-2 border-white/30 hover:scale-105",
                 style: { animation: "glowPulse 1.5s ease-in-out infinite" },
                 "data-testid": "link-generator",
-                children: "Generate Your Own Alien",
+                children: "Buy $MAGA",
               }),
               u.jsx("div", {
                 className:
@@ -23653,7 +23178,6 @@ function dE() {
       u.jsx(yi, { path: "/", component: IS }),
       u.jsx(yi, { path: "/generator", component: iE }),
       u.jsx(yi, { path: "/chart", component: sE }),
-      u.jsx(yi, { path: "/whitepaper", component: rE }),
       u.jsx(yi, { component: $S }),
     ],
   });
@@ -23662,15 +23186,15 @@ function hE() {
   const [a] = Qx(),
     i = a === "/",
     { data: r } = Ti({
-      queryKey: ["/api/audio"],
-      queryFn: async () => (await fetch("/api/audio")).json(),
+      queryKey: ["https://api-maga-eight.vercel.app/api/audio"],
+      queryFn: async () => (await fetch("https://api-maga-eight.vercel.app/api/audio")).json(),
     }),
     [c, f] = w.useState(null),
     h = w.useRef(null),
     [m, y] = w.useState(!0);
   w.useEffect(() => {
     r?.url &&
-      fetch("/api/media-url/audio")
+      fetch("https://api-maga-eight.vercel.app/api/media-url/audio")
         .then((p) => (p.ok ? p.json() : null))
         .then((p) => f(p?.url || r.url))
         .catch(() => f(r.url));
