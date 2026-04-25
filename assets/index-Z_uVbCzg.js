@@ -20161,7 +20161,7 @@ function IS() {
                         style: {
                           background:
                             "linear-gradient(135deg,rgba(255,255,255,0.06),transparent)",
-                        },
+                        }, 
                         children: [
                           u.jsx("svg", {
                             viewBox: "0 0 24 24",
