@@ -19894,7 +19894,7 @@ const Si = "/assets/space-bg-BTVrci7Y.png",
 function IS() {
   const [a, i] = w.useState(!1),
     [r, c] = w.useState(null),
-    f = "0xcomingsoon";
+    f = "0x2aBffc173fD1040993E805C68663D6046e3f4b6d";
   w.useEffect(() => {
     const m = "maga_viewed_at",
       y = localStorage.getItem(m),
@@ -20181,7 +20181,7 @@ function IS() {
                       "flex flex-wrap justify-center gap-2 sm:gap-3 mb-6",
                     children: [
                       u.jsxs("a", {
-                        href: "https://dexscreener.com/ethereum/0xcomingsoon",
+                        href: "https://dexscreener.com/ethereum/0x2aBffc173fD1040993E805C68663D6046e3f4b6d",
                         target: "_blank",
                         rel: "noreferrer",
                         className:
@@ -20201,7 +20201,7 @@ function IS() {
                         ],
                       }),
                       u.jsxs("a", {
-                        href: "https://www.dextools.io/app/en/ether/pair-explorer/0xcomingsoon",
+                        href: "https://www.dextools.io/app/en/ether/pair-explorer/0x2aBffc173fD1040993E805C68663D6046e3f4b6d",
                         target: "_blank",
                         rel: "noreferrer",
                         className:
@@ -20361,7 +20361,7 @@ function tE({ spaceBg: a }) {
                 children: "ALIEN CHRONICLES",
               }),
               u.jsx("a", {
-                href: "https://app.uniswap.org/#/swap?inputCurrency=eth&outputCurrency=0xcomingsoon",
+                href: "https://app.uniswap.org/#/swap?inputCurrency=eth&outputCurrency=0x2aBffc173fD1040993E805C68663D6046e3f4b6d",
                 className:
                   "inline-flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6 px-4 sm:px-12 py-3 sm:py-6 bg-primary hover:bg-primary/80 text-white font-black text-base sm:text-2xl md:text-3xl uppercase tracking-widest transition-all mx-auto border-2 border-white/30 hover:scale-105",
                 style: { animation: "glowPulse 1.5s ease-in-out infinite" },
